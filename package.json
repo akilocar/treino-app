@@ -1,0 +1,12 @@
+{
+  "name": "treino-app",
+  "private": true,
+  "scripts": {
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy",
+    "build": "python3 fonte/build.py"
+  },
+  "devDependencies": {
+    "wrangler": "^4.131.2"
+  }
+}

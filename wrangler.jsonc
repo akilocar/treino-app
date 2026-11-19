@@ -1,0 +1,19 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "treino-app",
+  "main": "src/worker.js",
+  "compatibility_date": "2026-11-01",
+  "assets": {
+    "directory": "./public",
+    "binding": "ASSETS",
+    "run_worker_first": ["/api/*"]
+  },
+  "d1_databases": [
+    { "binding": "DB", "database_name": "treino", "database_id": "be33abf2-f162-4d36-9a6d-85c9f5f08c9f" }
+  ],
+  "r2_buckets": [
+    { "binding": "ARQ", "bucket_name": "treino-arquivos" }
+  ],
+  "ai": { "binding": "AI" },
+  "observability": { "enabled": true }
+}

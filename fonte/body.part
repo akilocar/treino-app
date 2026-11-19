@@ -1,0 +1,9 @@
+<div class="app" id="app"></div>
+<nav class="tabs" id="tabs" hidden><div>
+  <button data-tab="hoje"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 8v8M18 8v8M3 10v4M21 10v4M6 12h12"/></svg>Hoje</button>
+  <button data-tab="ficha"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="3" width="14" height="18" rx="2"/><path d="M9 8h6M9 12h6M9 16h4"/></svg>Ficha</button>
+  <button data-tab="biblio"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M10 9l5 3-5 3z" fill="currentColor"/></svg>Exercícios</button>
+  <button data-tab="evolucao"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg>Evolução</button>
+</div></nav>
+<div id="extra"></div>
+<div id="sinc" class="sinc" hidden></div>

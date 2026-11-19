@@ -1,0 +1,105 @@
+/* VOICE: personal de academia no bolso — direto, encorajador, sem enfeite
+   IDEA: a ficha de treino de papel da academia, virada app: letra do treino grande, séries para ticar
+   PICTURE: o próprio app funcionando; o cartão do "treino de hoje" é a peça principal
+   COLOUR and TYPE: borracha preta / giz branco, vermelho de anilha como acento; Archivo condensada + Inter
+   LAYOUT: coluna de celular (máx. 460px), barra de abas embaixo, folhas que sobem de baixo */
+:root{color-scheme:light dark;
+  --bg:light-dark(#F3F1EE,#0F0F10);--card:light-dark(#FFFFFF,#1A1A1C);--card2:light-dark(#EAE7E2,#242427);
+  --ink:light-dark(#141414,#F2F0EC);--mut:light-dark(#6B6863,#9C9893);--line:light-dark(#E0DCD6,#2C2C30);
+  --acc:#E5392B;--acc-ink:#fff;--ok:light-dark(#1E7A46,#4CC27E);--warn:light-dark(#9A5B00,#F0B44C);--warnbg:light-dark(#FFF3DD,#2E2412)}
+:root[data-theme=light]{color-scheme:light}:root[data-theme=dark]{color-scheme:dark}
+*{box-sizing:border-box;min-width:0}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 Inter,system-ui,sans-serif;overflow-x:clip;-webkit-tap-highlight-color:transparent}
+h1,h2,h3,.big{font-family:Archivo,"Arial Narrow","Roboto Condensed",sans-serif;font-stretch:80%;margin:0;line-height:1.05;text-wrap:balance}
+h1{font-size:34px;font-weight:850}h2{font-size:24px;font-weight:800}h3{font-size:18px;font-weight:750}
+button,input,select{font:inherit;color:inherit}
+button{cursor:pointer;border:0;background:none;min-height:44px}
+:focus-visible{outline:3px solid var(--acc);outline-offset:2px}
+.app{max-width:460px;margin:0 auto;min-height:100vh;padding:0 16px 104px;position:relative}
+.top{display:flex;align-items:center;justify-content:space-between;padding:18px 0 10px}
+.mut{color:var(--mut)}.sm{font-size:14px}.xs{font-size:13px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:18px;margin:12px 0}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border-radius:14px;padding:0 18px;font-weight:650;background:var(--card2)}
+.btn.pri{background:var(--acc);color:var(--acc-ink)}.btn.full{width:100%;min-height:54px;font-size:17px}
+.btn.lin{background:none;border:1px solid var(--line)}
+.ico{width:22px;height:22px;flex:none}
+.iconbtn{width:44px;height:44px;border-radius:12px;display:grid;place-items:center;background:var(--card2)}
+.hero{background:var(--ink);color:var(--bg);border:0;padding:22px;position:relative;overflow:hidden}
+.hero .mut{color:color-mix(in srgb,var(--bg) 65%,transparent)}
+.letra{font-family:Archivo;font-stretch:75%;font-weight:900;font-size:120px;line-height:.8;position:absolute;right:14px;top:14px;color:var(--acc);opacity:.95}
+.hero h2{font-size:30px;max-width:70%;margin-top:6px}
+.chips{display:flex;gap:8px;overflow-x:auto;padding:2px 0 6px;scrollbar-width:none}
+.chip{flex:none;border-radius:999px;padding:0 14px;background:var(--card2);font-weight:600;font-size:14px;min-height:40px}
+.chip.on{background:var(--ink);color:var(--bg)}
+.semana{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;margin-top:12px}
+.dia{text-align:center;font-size:12px;color:var(--mut)}
+.dia b{display:grid;place-items:center;margin:4px auto 0;width:34px;height:34px;border-radius:50%;background:var(--card2);font-size:13px;color:var(--mut)}
+.dia.feito b{background:var(--acc);color:#fff}.dia.hoje b{outline:2px solid var(--ink)}
+.lista{display:flex;flex-direction:column;gap:10px}
+.ex{display:grid;grid-template-columns:56px 1fr auto;gap:12px;align-items:center;background:var(--card);border:1px solid var(--line);border-radius:16px;padding:10px;text-align:left;width:100%}
+.thumb{width:56px;height:56px;border-radius:12px;background:var(--card2);display:grid;place-items:center;color:var(--mut);font-family:Archivo;font-weight:800;font-size:13px;position:relative}
+.thumb.v{background:var(--acc);color:#fff}
+.ex .nome{font-weight:650;line-height:1.25}
+.tag{display:inline-block;font-size:12px;font-weight:600;padding:2px 8px;border-radius:999px;background:var(--card2);color:var(--mut);margin-top:4px}
+.tag.up{background:color-mix(in srgb,var(--ok) 18%,transparent);color:var(--ok)}
+.aviso{background:var(--warnbg);color:var(--warn);border-radius:14px;padding:12px 14px;font-size:14px;margin:10px 0}
+.tabs{position:fixed;left:0;right:0;bottom:0;background:color-mix(in srgb,var(--bg) 88%,transparent);backdrop-filter:blur(14px);border-top:1px solid var(--line);z-index:20}
+.tabs div{max-width:460px;margin:0 auto;display:grid;grid-template-columns:repeat(4,1fr);padding:6px 8px calc(6px + env(safe-area-inset-bottom))}
+.tabs button{display:flex;flex-direction:column;align-items:center;gap:2px;font-size:12px;font-weight:600;color:var(--mut);min-height:52px}
+.tabs button.on{color:var(--acc)}
+/* treino em andamento */
+.serie{display:grid;grid-template-columns:34px 1fr 1fr 52px;gap:8px;align-items:center;margin-top:8px}
+.serie .n{font-family:Archivo;font-weight:800;color:var(--mut);text-align:center}
+.campo{display:flex;align-items:center;background:var(--card2);border-radius:12px;padding:0 10px;min-height:46px}
+.campo input{width:100%;border:0;background:none;font-size:17px;font-weight:650;padding:0;outline:none}
+.campo span{font-size:12px;color:var(--mut)}
+.tick{width:52px;height:46px;border-radius:12px;background:var(--card2);display:grid;place-items:center}
+.tick.on{background:var(--ok);color:#fff}
+.exbox{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:14px;margin:10px 0}
+.exbox.ok{border-color:var(--ok)}
+.exhead{display:grid;grid-template-columns:56px 1fr;gap:12px;align-items:center;text-align:left;width:100%;padding:0}
+.acoes{display:flex;gap:8px;margin-top:10px}.acoes .btn{flex:1;min-height:40px;font-size:14px}
+.barra{height:6px;border-radius:9px;background:var(--card2);overflow:hidden;margin-top:10px}.barra i{display:block;height:100%;background:var(--acc);transition:width .3s}
+.descanso{position:fixed;left:50%;transform:translateX(-50%);bottom:84px;width:min(428px,calc(100% - 32px));background:var(--ink);color:var(--bg);border-radius:18px;padding:12px 14px;display:flex;align-items:center;gap:12px;z-index:25;box-shadow:0 10px 30px rgba(0,0,0,.25)}
+.descanso .t{font-family:Archivo;font-weight:900;font-size:34px;font-stretch:80%;min-width:86px;font-variant-numeric:tabular-nums}
+.descanso button{background:color-mix(in srgb,var(--bg) 15%,transparent);border-radius:10px;padding:0 12px;font-weight:650;color:var(--bg)}
+/* folha que sobe */
+.veu{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:40;display:flex;align-items:flex-end;justify-content:center}
+.folha{background:var(--bg);width:100%;max-width:460px;max-height:92vh;overflow:auto;border-radius:24px 24px 0 0;padding:10px 18px 28px;animation:sobe .25s ease-out}
+@keyframes sobe{from{transform:translateY(40px);opacity:.4}}
+@media (prefers-reduced-motion:reduce){.folha{animation:none}.barra i{transition:none}}
+.puxa{width:40px;height:5px;border-radius:9px;background:var(--line);margin:4px auto 12px}
+.video{aspect-ratio:9/12;max-height:52vh;width:100%;border-radius:18px;background:var(--card2);display:flex;flex-direction:column;justify-content:center;align-items:center;gap:10px;text-align:center;padding:20px;margin:12px 0;overflow:hidden}
+.video video{width:100%;height:100%;object-fit:cover;border-radius:18px}
+.passos{padding-left:0;list-style:none;counter-reset:p;margin:8px 0}
+.passos li{counter-increment:p;display:grid;grid-template-columns:30px 1fr;gap:8px;margin:8px 0}
+.passos li::before{content:counter(p);font-family:Archivo;font-weight:900;font-size:18px;color:var(--acc)}
+.prompt{background:var(--card2);border-radius:12px;padding:12px;font-size:13px;color:var(--mut);margin:8px 0}
+/* boas-vindas */
+.opcoes{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin:14px 0}
+.op{background:var(--card);border:2px solid var(--line);border-radius:16px;padding:14px;text-align:left;min-height:64px}
+.op.on{border-color:var(--acc);background:color-mix(in srgb,var(--acc) 8%,var(--card))}
+.op b{display:block;font-size:16px}.op span{font-size:13px;color:var(--mut)}
+.num{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin:14px 0}
+.num .op{text-align:center;font-family:Archivo;font-weight:900;font-size:28px;padding:10px 0}
+.check{display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--line);width:100%;text-align:left}
+.check i{width:24px;height:24px;border-radius:7px;border:2px solid var(--line);flex:none;display:grid;place-items:center}
+.check.on i{background:var(--acc);border-color:var(--acc);color:#fff}
+.campo-txt{width:100%;border:1px solid var(--line);background:var(--card);border-radius:14px;min-height:52px;padding:0 14px;font-size:17px}
+.passo-ind{display:flex;gap:6px;margin:16px 0 18px}.passo-ind i{flex:1;height:4px;border-radius:9px;background:var(--line)}.passo-ind i.on{background:var(--acc)}
+.fotos{border:2px dashed var(--line);border-radius:16px;padding:16px;text-align:center;margin:12px 0}
+.stat{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.stat div{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:12px}
+.stat b{font-family:Archivo;font-weight:900;font-size:30px;display:block;line-height:1}
+.barras{display:grid;grid-template-columns:repeat(8,1fr);gap:6px;align-items:end;height:120px;margin-top:10px}
+.barras div{display:flex;flex-direction:column;justify-content:flex-end;align-items:center;height:100%;font-size:11px;color:var(--mut)}
+.barras i{display:block;width:100%;border-radius:6px 6px 2px 2px;background:var(--acc);min-height:3px}
+.barras i.baixo{background:var(--card2)}
+.linha{display:flex;justify-content:space-between;gap:10px;padding:10px 0;border-bottom:1px solid var(--line)}
+.linha:last-child{border:0}
+.nota{font-size:13px;color:var(--mut);text-align:center;margin:18px 0 0}
+.toast{position:fixed;top:16px;left:50%;transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:10px 16px;border-radius:12px;font-weight:600;font-size:14px;z-index:60}
+.ok-box{background:color-mix(in srgb,var(--ok) 14%,transparent);color:var(--ok);border-radius:14px;padding:12px 14px;font-size:14px;margin:10px 0}
+.sinc{position:fixed;top:calc(8px + env(safe-area-inset-top));right:12px;z-index:30;background:var(--card2);color:var(--mut);font-size:12px;font-weight:600;padding:4px 10px;border-radius:999px}
+.app{padding-top:env(safe-area-inset-top)}
+form .btn.full{margin-top:4px}
