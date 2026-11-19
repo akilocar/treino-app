@@ -21,7 +21,19 @@ var IC = {
   x: '<svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 6l12 12M18 6L6 18"/></svg>',
   cam: '<svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 8a2 2 0 0 1 2-2h2l2-2h6l2 2h2a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><circle cx="12" cy="13" r="4"/></svg>'
 };
-function thumb(id) { var e = EX[id]; return temVideo(id) ? '<div class="thumb v">' + IC.play + '</div>' : '<div class="thumb">' + esc(GRUPOS[e.g].slice(0, 4).toUpperCase()) + '</div>'; }
+var FOTO_GRUPO = { quadriceps: 'pernas', panturrilha: 'pernas', gluteo: 'gluteo', abdutor: 'corpo', adutor: 'corpo', posterior: 'gluteo', costas: 'costas', ombro_post: 'costas', peito: 'peito', ombro: 'ombros', biceps: 'bracos', triceps: 'bracos', abdomen: 'abdomen' };
+function thumb(id) { var e = EX[id]; return '<div class="thumb' + (temVideo(id) ? ' v' : '') + '" style="background-image:url(/fundos/m-' + FOTO_GRUPO[e.g] + '.webp)" aria-hidden="true"></div>'; }
+// foto de fundo: troca com fade conforme a tela e o músculo do dia
+var fundoAtual = '';
+function poeFundo(nome, modo) {
+  var f = document.getElementById('fundo'); if (!f) return;
+  f.className = 'fundo' + (modo ? ' ' + modo : '');
+  if (nome === fundoAtual) return; fundoAtual = nome;
+  var cam = f.querySelectorAll('i'), on = f.querySelector('i.on'), prox = on === cam[0] ? cam[1] : cam[0];
+  var img = new Image(); img.onload = function () { prox.style.backgroundImage = 'url(' + img.src + ')'; prox.classList.add('on'); if (on) on.classList.remove('on'); };
+  img.src = '/fundos/' + nome + '.webp';
+}
+function fotoDoDia(dia) { var c = {}; dia.itens.forEach(function (it, i) { var g = FOTO_GRUPO[EX[it.id].g]; c[g] = (c[g] || 0) + (i < 2 ? 3 : 1); }); return Object.keys(c).sort(function (a, b) { return c[b] - c[a]; })[0] || 'corpo'; }
 
 // ===== Boas-vindas (perfil) =====
 function telaPerfil() {
@@ -67,7 +79,7 @@ function resumoDivisao(r) {
 // ===== Hoje =====
 function telaHoje() {
   var pl = st.plano, i = ui.escolhido != null ? ui.escolhido : proximoTreino(pl, st.historico), dia = pl.dias[i];
-  var h = '<div class="top"><div><div class="mut sm">' + saudacao() + '</div><h2>' + esc(st.perfil.nome || 'Bora treinar') + '</h2></div><button class="iconbtn" data-a="ajustes" aria-label="Ajustes">' + IC.gear + '</button></div>';
+  var h = '<div class="top"><div><div class="marca">TREINO</div><div class="mut sm" style="margin-top:6px">' + saudacao() + '</div><h2>' + esc(st.perfil.nome || 'Bora treinar') + '</h2></div><button class="iconbtn" data-a="ajustes" aria-label="Ajustes">' + IC.gear + '</button></div><div class="respiro"></div>';
   if (st.treino) {
     var t = st.treino, feitos = t.ex.filter(fim).length;
     h += '<div class="card hero"><div class="mut sm">Treino em andamento</div><h2>' + esc(t.letra + ' · ' + t.nome) + '</h2><p class="mut sm">' + feitos + ' de ' + t.ex.length + ' exercícios</p><button class="btn pri full" data-a="abre-treino">Continuar treino</button></div>';
@@ -140,7 +152,7 @@ function cronometro() { var s = Math.floor((Date.now() - st.treino.inicio) / 100
 function iniciaDescanso(seg) { descanso = { fim: Date.now() + seg * 1000 }; pintaDescanso(); }
 function pintaDescanso() {
   var el = $('#extra .descanso');
-  if (!descanso) { if (el) el.remove(); return; }
+  if (!descanso || ui.tela !== 'treino') { if (el) el.remove(); return; }
   var r = Math.max(0, Math.ceil((descanso.fim - Date.now()) / 1000));
   if (!el) { el = document.createElement('div'); el.className = 'descanso'; $('#extra').appendChild(el); }
   el.innerHTML = '<div><div class="xs" style="opacity:.7">' + (r ? 'Descanso' : 'Bora!') + '</div><div class="t">' + Math.floor(r / 60) + ':' + String(r % 60).padStart(2, '0') + '</div></div><div style="flex:1"></div><button data-a="mais15">+15 s</button><button data-a="pula">Pular</button>';
@@ -287,14 +299,14 @@ function folhaReset(id, nome) {
 // ===== Entrada (login, primeiro acesso, troca de senha) =====
 function telaEntrada() {
   var t = ui.tela, m = ui.msg ? '<div class="aviso">' + esc(ui.msg) + '</div>' : '';
-  var h = '<div style="padding-top:12vh"><div class="letra" style="position:static;font-size:88px">T</div>';
+  var h = '<div class="capa"><div class="marca">TREINO</div>';
   if (t === 'primeiro') return h + '<h1 style="margin-top:12px">Primeiro acesso</h1><p class="mut">Crie a conta do administrador. Depois você adiciona as outras pessoas pelo app.</p>' + m +
     '<form data-f="primeiro"><input class="campo-txt" name="nome" placeholder="Seu nome" autocomplete="name" style="margin:6px 0"><input class="campo-txt" name="email" type="email" placeholder="E-mail" autocomplete="username" required style="margin:6px 0">' +
     '<input class="campo-txt" name="senha" type="password" placeholder="Crie uma senha (mín. 8)" minlength="8" autocomplete="new-password" required style="margin:6px 0 14px"><button class="btn pri full">Criar conta</button></form></div>';
   if (t === 'senha') return h + '<h1 style="margin-top:12px">' + (USR && USR.senha_provisoria ? 'Crie sua senha' : 'Trocar senha') + '</h1><p class="mut">' + (USR && USR.senha_provisoria ? 'Você entrou com uma senha provisória. Escolha uma senha só sua.' : '') + '</p>' + m +
     '<form data-f="senha"><input class="campo-txt" name="atual" type="password" placeholder="Senha ' + (USR && USR.senha_provisoria ? 'provisória' : 'atual') + '" autocomplete="current-password" required style="margin:6px 0"><input class="campo-txt" name="nova" type="password" placeholder="Nova senha (mín. 8)" minlength="8" autocomplete="new-password" required style="margin:6px 0 14px"><button class="btn pri full">Salvar senha</button></form>' +
     (USR && !USR.senha_provisoria ? '<p class="nota"><button class="btn lin" data-a="volta-app">Voltar</button></p>' : '') + '</div>';
-  return h + '<h1 style="margin-top:12px">Seu personal no bolso.</h1><p class="mut">Entre com seu e-mail e senha.</p>' + m +
+  return h + '<h1 style="margin-top:10px">Seu personal no bolso.</h1><p class="mut">Entre com seu e-mail e senha.</p>' + m +
     '<form data-f="entrar"><input class="campo-txt" name="email" type="email" placeholder="E-mail" autocomplete="username" required style="margin:6px 0"><input class="campo-txt" name="senha" type="password" placeholder="Senha" autocomplete="current-password" required style="margin:6px 0 14px"><button class="btn pri full">Entrar</button></form>' +
     '<p class="nota">Esqueceu a senha? Peça para quem te cadastrou criar uma nova.</p></div>';
 }
@@ -303,6 +315,7 @@ function telaLogin(msg) { USR = null; ui.tela = 'login'; ui.msg = msg || ''; ui.
 // ===== Desenho =====
 function desenha() {
   var a = $('#app'), tabs = $('#tabs');
+  escolheFundo();
   if (ui.tela === 'carregando') { tabs.hidden = true; a.innerHTML = '<div style="padding-top:30vh;text-align:center" class="mut">Carregando…</div>'; }
   else if (['login', 'primeiro', 'senha'].indexOf(ui.tela) >= 0) { tabs.hidden = true; a.innerHTML = telaEntrada(); }
   else if (!st.perfil || ui.tela === 'perfil') { tabs.hidden = true; a.innerHTML = telaPerfil(); }
@@ -317,6 +330,16 @@ function desenha() {
   else if (v) v.remove();
   pintaDescanso(); pintaSinc();
 }
+function escolheFundo() {
+  var t = ui.tela;
+  if (t === 'carregando' || t === 'login' || t === 'primeiro' || t === 'senha') return poeFundo('entrada', 'cheio');
+  if (!st.perfil || t === 'perfil') return poeFundo('corpo', 'leve');
+  if (t === 'treino' && st.treino) { var d = st.plano.dias.filter(function (x) { return x.letra === st.treino.letra; })[0]; return poeFundo(d ? fotoDoDia(d) : 'corpo', 'leve'); }
+  if (ui.tab === 'hoje') { var i = st.treino ? st.plano.dias.findIndex(function (x) { return x.letra === st.treino.letra; }) : (ui.escolhido != null ? ui.escolhido : proximoTreino(st.plano, st.historico)); return poeFundo(fotoDoDia(st.plano.dias[Math.max(0, i)]), 'cheio'); }
+  if (ui.tab === 'ficha') return poeFundo(fotoDoDia(st.plano.dias[ui.fichaDia] || st.plano.dias[0]), 'leve');
+  if (ui.tab === 'biblio') return poeFundo('aparelhos', 'leve');
+  if (ui.tab === 'evolucao') return poeFundo('evolucao', 'leve');
+}
 function abreSheet(html) { ui.sheet = html; desenha(); }
 
 // ===== Ações =====
@@ -324,7 +347,7 @@ function novoRascunho() { return st.perfil ? JSON.parse(JSON.stringify(st.perfil
 function fechaPerfil() {
   var mudou = !st.perfil || ['sexo', 'dias', 'objetivo', 'nivel'].some(function (k) { return st.perfil[k] !== ui.rasc[k]; }) || st.perfil.equip.join() !== ui.rasc.equip.join();
   st.perfil = ui.rasc; if (mudou) st.plano = gerarPlano(st.perfil, 0);
-  salva(); ui.tela = null; ui.tab = 'hoje'; desenha();
+  salva(); ui.tela = null; ui.tab = 'hoje'; desenha(); window.scrollTo(0, 0);
   if (st.plano.avisos.length) toast('Atenção: veja os avisos na Ficha');
 }
 function copia(t) {
@@ -344,7 +367,7 @@ document.addEventListener('click', function (ev) {
   else if (a === 'preset') { ui.rasc.equip = PRESETS[v].eq.slice(); desenha(); }
   else if (a === 'equip') { var q = ui.rasc.equip, i = q.indexOf(v); if (i >= 0) q.splice(i, 1); else q.push(v); desenha(); }
   else if (a === 'fecha-perfil') { ui.tela = null; desenha(); }
-  else if (a === 'escolhe') { ui.escolhido = +v; desenha(); }
+  else if (a === 'escolhe') { ui.escolhido = +v; desenha(); window.scrollTo({ top: 0, behavior: 'smooth' }); }
   else if (a === 'comecar') comecar(+v);
   else if (a === 'abre-treino') { ui.tela = 'treino'; desenha(); }
   else if (a === 'sai-treino') { ui.tela = null; desenha(); }

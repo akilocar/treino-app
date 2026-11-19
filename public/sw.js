@@ -1,6 +1,7 @@
 // Guarda a tela do app para abrir mesmo sem internet. Os dados (/api) e os vídeos nunca são guardados aqui.
-const CACHE = 'treino-20261119-1532';
-const ARQUIVOS = ['/', '/manifest.webmanifest', '/icone.svg', '/icone-192.png', '/icone-512.png', '/icone-180.png'];
+const CACHE = 'treino-20261119-1540';
+const ARQUIVOS = ['/', '/manifest.webmanifest', '/icone.svg', '/icone-192.png', '/icone-512.png', '/icone-180.png'].concat(
+  ['entrada', 'corpo', 'pernas', 'gluteo', 'costas', 'peito', 'ombros', 'bracos', 'abdomen', 'aparelhos', 'evolucao'].flatMap((n) => ['/fundos/' + n + '.webp', '/fundos/m-' + n + '.webp']));
 self.addEventListener('install', (e) => {
   e.waitUntil(caches.open(CACHE).then((c) => c.addAll(ARQUIVOS)).then(() => self.skipWaiting()));
 });
@@ -14,7 +15,7 @@ self.addEventListener('fetch', (e) => {
   // rede primeiro (sempre a versão mais nova); sem internet, usa a cópia guardada
   e.respondWith(
     fetch(e.request).then((r) => {
-      if (r.ok && (url.pathname === '/' || ARQUIVOS.includes(url.pathname))) {
+      if (r.ok && (url.pathname === "/" || ARQUIVOS.includes(url.pathname))) {
         const copia = r.clone();
         caches.open(CACHE).then((c) => c.put(url.pathname === '/index.html' ? '/' : e.request, copia));
       }

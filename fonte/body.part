@@ -1,3 +1,4 @@
+<div class="fundo" id="fundo"><i></i><i></i></div>
 <div class="app" id="app"></div>
 <nav class="tabs" id="tabs" hidden><div>
   <button data-tab="hoje"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 8v8M18 8v8M3 10v4M21 10v4M6 12h12"/></svg>Hoje</button>

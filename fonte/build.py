@@ -10,7 +10,8 @@ head = '''<!doctype html>
 <meta charset="utf-8">
 <title>Treino</title>
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#0F0F10">
+<meta name="theme-color" content="#08090A">
+<meta name="color-scheme" content="dark">
 <meta name="robots" content="noindex,nofollow">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
