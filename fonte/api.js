@@ -72,8 +72,15 @@ function carregaVideos() {
     VIDEOS = {}; (r.videos || []).forEach(function (v) { VIDEOS[v.ex_id + '|' + v.sexo] = v.enviado_em; });
   }).catch(function () {});
 }
-function temVideo(id, sexo) { return !!VIDEOS[id + '|' + (sexo || st.perfil.sexo)]; }
-function urlVideo(id, sexo) { sexo = sexo || st.perfil.sexo; return '/api/video/' + id + '/' + sexo + '?v=' + encodeURIComponent(VIDEOS[id + '|' + sexo] || ''); }
+// Vídeos: o enviado pelo admin (R2) tem prioridade; senão usa o vídeo padrão que vem junto com o app (public/videos).
+function temVideoEnviado(id, sexo) { return !!VIDEOS[id + '|' + (sexo || st.perfil.sexo)]; }
+function temVideoPadrao(id, sexo) { return VIDEOS_PADRAO.indexOf(id + '-' + (sexo || st.perfil.sexo)) >= 0; }
+function temVideo(id, sexo) { return temVideoEnviado(id, sexo) || temVideoPadrao(id, sexo); }
+function urlVideo(id, sexo) {
+  sexo = sexo || st.perfil.sexo;
+  if (temVideoEnviado(id, sexo)) return '/api/video/' + id + '/' + sexo + '?v=' + encodeURIComponent(VIDEOS[id + '|' + sexo]);
+  return '/videos/' + id + '-' + sexo + '.mp4';
+}
 
 function enviaVideo(id, sexo, arq, progresso) {
   return new Promise(function (ok, falha) {

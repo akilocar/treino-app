@@ -3,7 +3,8 @@ import os, re, datetime
 d = os.path.dirname(os.path.abspath(__file__))
 L = lambda n: open(os.path.join(d, n), encoding='utf-8').read()
 VERSAO = datetime.datetime.now().strftime('%Y%m%d-%H%M')
-js = '  var VERSAO = "' + VERSAO + '";\n' + L('dados.js') + L('motor.js') + L('api.js') + L('app.js')
+vids = sorted(f[:-4] for f in os.listdir(os.path.join(d, '..', 'public', 'videos')) if f.endswith('.mp4'))
+js = '  var VERSAO = "' + VERSAO + '";\n  var VIDEOS_PADRAO = ' + repr(vids).replace("'", '"') + ';\n' + L('dados.js') + L('motor.js') + L('api.js') + L('app.js')
 head = '''<!doctype html>
 <html lang="pt-BR">
 <head>
@@ -31,4 +32,4 @@ open(os.path.join(pub, 'index.html'), 'w', encoding='utf-8').write(out)
 open(os.path.join(pub, 'versao.txt'), 'w', encoding='utf-8').write(VERSAO + '\n')
 sw = os.path.join(pub, 'sw.js'); s = open(sw, encoding='utf-8').read()
 open(sw, 'w', encoding='utf-8').write(re.sub(r"const CACHE = '[^']*'", "const CACHE = 'treino-" + VERSAO + "'", s))
-print('versao', VERSAO, '| public/index.html', len(out), 'bytes')
+print('videos padrao', len(vids), '| versao', VERSAO, '| public/index.html', len(out), 'bytes')

@@ -236,10 +236,10 @@ function painelVideoAdmin(id) {
   var e = EX[id];
   return '<div class="card"><h3>Vídeos deste exercício</h3>' + ['F', 'M'].map(function (sx) {
     var tem = temVideo(id, sx), sub = ui.subindo && ui.subindo.id === id && ui.subindo.sx === sx;
-    return '<div class="linha" style="align-items:center"><span><b>' + (sx === 'F' ? 'Mulher' : 'Homem') + '</b><br><span class="xs mut">' + (sub ? 'Enviando ' + Math.round(ui.subindo.p * 100) + '%' : tem ? 'Enviado' : 'Falta enviar') + '</span></span>' +
+    return '<div class="linha" style="align-items:center"><span><b>' + (sx === 'F' ? 'Mulher' : 'Homem') + '</b><br><span class="xs mut">' + (sub ? 'Enviando ' + Math.round(ui.subindo.p * 100) + '%' : temVideoEnviado(id, sx) ? 'Enviado por você' : temVideoPadrao(id, sx) ? 'Vídeo padrão do app' : 'Sem vídeo') + '</span></span>' +
       '<span style="display:flex;gap:6px"><button class="btn" data-a="copia-prompt" data-v="' + id + '" data-s="' + sx + '">Texto</button>' +
       '<label class="btn ' + (tem ? '' : 'pri') + '">' + (tem ? 'Trocar' : 'Enviar') + '<input type="file" accept="video/*" hidden data-a="video" data-v="' + id + '" data-s="' + sx + '"></label>' +
-      (tem ? '<button class="iconbtn" data-a="apaga-video" data-v="' + id + '" data-s="' + sx + '" aria-label="Apagar vídeo">' + IC.x + '</button>' : '') + '</span></div>';
+      (temVideoEnviado(id, sx) ? '<button class="iconbtn" data-a="apaga-video" data-v="' + id + '" data-s="' + sx + '" aria-label="Apagar vídeo enviado">' + IC.x + '</button>' : '') + '</span></div>';
   }).join('') + '<p class="xs mut">Texto para o Google Flow (mulher):</p><div class="prompt">' + esc(promptFlow(e, 'F')) + '</div></div>';
 }
 function folhaDetalhe(id) {
