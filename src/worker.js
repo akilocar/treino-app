@@ -361,29 +361,10 @@ async function lerAparelhos(req, env) {
   });
 }
 
-// ===== importação de vídeos gerados no Google Flow =====
-// Chave temporária gravada em segredos('importacao') como "<chave>|<expira_ms>". Só aceita chamadas vindas do Flow.
-const ORIGEM_FLOW = 'https://flow.google.com';
-function corsFlow(extra = {}) {
-  return { 'Access-Control-Allow-Origin': ORIGEM_FLOW, 'Access-Control-Allow-Methods': 'PUT, OPTIONS', 'Access-Control-Allow-Headers': 'Content-Type, X-Chave', 'Access-Control-Max-Age': '600', ...extra };
-}
-async function importaVideo(req, env, ex, sexo) {
-  if (req.method === 'OPTIONS') return new Response(null, { status: 204, headers: corsFlow() });
-  const r = await env.DB.prepare('SELECT valor FROM segredos WHERE nome = ?').bind('importacao').first();
-  const [chave, expira] = r ? r.valor.split('|') : [];
-  const enviada = req.headers.get('X-Chave') || '';
-  if (!chave || +expira < Date.now() || !iguais(enviada, chave)) return new Response(JSON.stringify({ erro: 'Chave de importação inválida ou vencida.' }), { status: 403, headers: corsFlow({ 'Content-Type': 'application/json' }) });
-  const resp = await gravaVideo(req, env.DB, env.ARQ, ex, sexo);
-  const h = new Headers(resp.headers); Object.entries(corsFlow()).forEach(([k, v]) => h.set(k, v));
-  return new Response(resp.body, { status: resp.status, headers: h });
-}
-
 // ===== roteador =====
 async function api(req, env) {
   const url = new URL(req.url), rota = url.pathname, m = req.method, db = env.DB;
   await prepara(db);
-  const imp = rota.match(/^\/api\/importar\/video\/([a-z0-9_]+)\/(F|M)$/);
-  if (imp && ID_OK.test(imp[1]) && (m === 'PUT' || m === 'OPTIONS')) return importaVideo(req, env, imp[1], imp[2]);
   if (m !== 'GET' && m !== 'HEAD') {
     const origem = req.headers.get('Origin');
     if (origem && origem !== url.origin) return json({ erro: 'Origem não permitida.' }, 403);
