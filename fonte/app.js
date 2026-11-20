@@ -236,7 +236,7 @@ function caixaVideo(id) {
 function painelVideoAdmin(id) {
   var e = EX[id];
   return '<div class="card"><h3>Vídeos deste exercício</h3>' + ['F', 'M'].map(function (sx) {
-    var tem = temVideo(id, sx), sub = ui.subindo && ui.subindo.id === id && ui.subindo.sx === sx;
+    var tem = temVideoDoSexo(id, sx), sub = ui.subindo && ui.subindo.id === id && ui.subindo.sx === sx;
     return '<div class="linha" style="align-items:center"><span><b>' + (sx === 'F' ? 'Mulher' : 'Homem') + '</b><br><span class="xs mut">' + (sub ? 'Enviando ' + Math.round(ui.subindo.p * 100) + '%' : temVideoEnviado(id, sx) ? 'Enviado por você' : temVideoPadrao(id, sx) ? 'Vídeo padrão do app' : 'Sem vídeo') + '</span></span>' +
       '<span style="display:flex;gap:6px"><button class="btn" data-a="copia-prompt" data-v="' + id + '" data-s="' + sx + '">Texto</button>' +
       '<label class="btn ' + (tem ? '' : 'pri') + '">' + (tem ? 'Trocar' : 'Enviar') + '<input type="file" accept="video/*" hidden data-a="video" data-v="' + id + '" data-s="' + sx + '"></label>' +
@@ -284,11 +284,11 @@ function folhaPessoas(lista, msg) {
     '<form data-f="nova-pessoa"><input class="campo-txt" name="nome" placeholder="Nome" style="margin:6px 0"><input class="campo-txt" name="email" type="email" placeholder="E-mail" required style="margin:6px 0"><input class="campo-txt" name="senha" placeholder="Senha provisória (mín. 8)" minlength="8" required style="margin:6px 0"><button class="btn pri full">Adicionar</button></form></div>';
 }
 function folhaVideosAdmin() {
-  var lst = EXERCICIOS.slice().sort(function (a, b) { return (temVideo(a.id, 'F') + temVideo(a.id, 'M')) - (temVideo(b.id, 'F') + temVideo(b.id, 'M')); });
-  var feitos = EXERCICIOS.filter(function (e) { return temVideo(e.id, 'F'); }).length, feitosM = EXERCICIOS.filter(function (e) { return temVideo(e.id, 'M'); }).length;
+  var lst = EXERCICIOS.slice().sort(function (a, b) { return (temVideoDoSexo(a.id, 'F') + temVideoDoSexo(a.id, 'M')) - (temVideoDoSexo(b.id, 'F') + temVideoDoSexo(b.id, 'M')); });
+  var feitos = EXERCICIOS.filter(function (e) { return temVideoDoSexo(e.id, 'F'); }).length, feitosM = EXERCICIOS.filter(function (e) { return temVideoDoSexo(e.id, 'M'); }).length;
   return '<div class="puxa"></div><div style="display:flex;justify-content:space-between"><h2>Vídeos</h2><button class="iconbtn" data-a="ajustes" aria-label="Voltar">' + IC.x + '</button></div>' +
     '<p class="mut sm">Mulher: ' + feitos + ' de ' + EXERCICIOS.length + ' · Homem: ' + feitosM + ' de ' + EXERCICIOS.length + '. Toque num exercício para copiar o texto do Flow e enviar o vídeo.</p><div class="lista">' +
-    lst.map(function (e) { return '<button class="ex" data-a="detalhe" data-v="' + e.id + '">' + thumb(e.id) + '<div><div class="nome">' + esc(e.n) + '</div><div class="mut sm">Mulher ' + (temVideo(e.id, 'F') ? '✓' : '—') + ' · Homem ' + (temVideo(e.id, 'M') ? '✓' : '—') + '</div></div><span></span></button>'; }).join('') + '</div>';
+    lst.map(function (e) { return '<button class="ex" data-a="detalhe" data-v="' + e.id + '">' + thumb(e.id) + '<div><div class="nome">' + esc(e.n) + '</div><div class="mut sm">Mulher ' + (temVideoDoSexo(e.id, 'F') ? '✓' : '—') + ' · Homem ' + (temVideoDoSexo(e.id, 'M') ? '✓' : '—') + '</div></div><span></span></button>'; }).join('') + '</div>';
 }
 function folhaConfirma(texto, acao, v) {
   return '<div class="puxa"></div><h2>Tem certeza?</h2><p>' + esc(texto) + '</p><div style="display:flex;gap:10px"><button class="btn lin" style="flex:1" data-a="fecha">Cancelar</button><button class="btn pri" style="flex:1" data-a="' + acao + '" data-v="' + v + '">Confirmar</button></div>';

@@ -75,9 +75,12 @@ function carregaVideos() {
 // Vídeos: o enviado pelo admin (R2) tem prioridade; senão usa o vídeo padrão que vem junto com o app (public/videos).
 function temVideoEnviado(id, sexo) { return !!VIDEOS[id + '|' + (sexo || st.perfil.sexo)]; }
 function temVideoPadrao(id, sexo) { return VIDEOS_PADRAO.indexOf(id + '-' + (sexo || st.perfil.sexo)) >= 0; }
-function temVideo(id, sexo) { return temVideoEnviado(id, sexo) || temVideoPadrao(id, sexo); }
+function temVideoDoSexo(id, sexo) { return temVideoEnviado(id, sexo) || temVideoPadrao(id, sexo); }
+// Sem vídeo do sexo do perfil, usa o do outro sexo (melhor que ficar sem demonstração).
+function sexoDoVideo(id, sexo) { sexo = sexo || st.perfil.sexo; var outro = sexo === 'F' ? 'M' : 'F'; return temVideoDoSexo(id, sexo) ? sexo : (temVideoDoSexo(id, outro) ? outro : null); }
+function temVideo(id, sexo) { return !!sexoDoVideo(id, sexo); }
 function urlVideo(id, sexo) {
-  sexo = sexo || st.perfil.sexo;
+  sexo = sexoDoVideo(id, sexo) || sexo || st.perfil.sexo;
   if (temVideoEnviado(id, sexo)) return '/api/video/' + id + '/' + sexo + '?v=' + encodeURIComponent(VIDEOS[id + '|' + sexo]);
   return '/videos/' + id + '-' + sexo + '.mp4';
 }
