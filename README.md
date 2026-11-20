@@ -42,3 +42,5 @@ A tela é um arquivo só (`public/index.html`), montado a partir dos pedaços em
 - `style.css` e `body.part`: visual e estrutura
 
 Depois de editar, rode `python3 fonte/build.py` e envie o `public/index.html` gerado junto com os pedaços.
+
+Endereço: https://treino-app.jrcc75.workers.dev
