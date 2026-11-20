@@ -163,7 +163,8 @@ async function entrar(req, db) {
 
 async function trocarSenha(req, db, u) {
   const b = await corpo(req);
-  if (!iguais(await pbkdf2(String(b.atual || ''), u.salt, u.iteracoes), u.hash)) return json({ erro: 'A senha atual está errada.' }, 400);
+  // Quem está com senha provisória acabou de entrar com ela: não pede de novo.
+  if (!u.senha_provisoria && !iguais(await pbkdf2(String(b.atual || ''), u.salt, u.iteracoes), u.hash)) return json({ erro: 'A senha atual está errada.' }, 400);
   if (String(b.nova || '').length < 8) return json({ erro: 'A nova senha precisa ter pelo menos 8 caracteres.' }, 400);
   const salt = sorteia(16);
   await db.prepare('UPDATE usuarios SET salt = ?, hash = ?, iteracoes = ?, senha_provisoria = 0, versao_senha = versao_senha + 1 WHERE id = ?')

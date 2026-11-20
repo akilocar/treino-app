@@ -41,7 +41,7 @@ function telaPerfil() {
   var ind = '<div class="passo-ind">' + [0, 1, 2, 3].map(function (i) { return '<i class="' + (i <= p ? 'on' : '') + '"></i>'; }).join('') + '</div>';
   var h = '<div class="top"><span class="mut sm">Passo ' + (p + 1) + ' de 4</span>' + (st.perfil ? '<button class="iconbtn" data-a="fecha-perfil" aria-label="Fechar">' + IC.x + '</button>' : '') + '</div>' + ind;
   if (p === 0) {
-    h += '<h1>Seu personal no bolso.</h1><p class="mut">Conte um pouco sobre você e o app monta sua ficha.</p>' +
+    h += '<h1>Vamos montar seu treino</h1><p class="mut">Conte um pouco sobre você e o app monta sua ficha.</p>' +
       '<label class="sm" for="nome">Como você se chama?</label><input id="nome" class="campo-txt" value="' + esc(r.nome) + '" placeholder="Seu nome" autocomplete="given-name" style="margin:6px 0 14px">' +
       '<div class="sm">Sexo</div><div class="opcoes">' +
       op('sexo', 'F', 'Mulher', 'Ênfase em glúteo e pernas') + op('sexo', 'M', 'Homem', 'Divisão clássica por músculo') + '</div>';
@@ -320,13 +320,18 @@ function telaEntrada() {
   if (t === 'primeiro') return h + '<h1 style="margin-top:12px">Primeiro acesso</h1><p class="mut">Crie a conta do administrador. Depois você adiciona as outras pessoas pelo app.</p>' + m +
     '<form data-f="primeiro"><input class="campo-txt" name="nome" placeholder="Seu nome" autocomplete="name" style="margin:6px 0"><input class="campo-txt" name="email" type="email" placeholder="E-mail" autocomplete="username" required style="margin:6px 0">' +
     '<input class="campo-txt" name="senha" type="password" placeholder="Crie uma senha (mín. 8)" minlength="8" autocomplete="new-password" required style="margin:6px 0 14px"><button class="btn pri full">Criar conta</button></form></div>';
-  if (t === 'senha') return h + '<h1 style="margin-top:12px">' + (USR && USR.senha_provisoria ? 'Crie sua senha' : 'Trocar senha') + '</h1><p class="mut">' + (USR && USR.senha_provisoria ? 'Você entrou com uma senha provisória. Escolha uma senha só sua.' : '') + '</p>' + m +
-    '<form data-f="senha"><input class="campo-txt" name="atual" type="password" placeholder="Senha ' + (USR && USR.senha_provisoria ? 'provisória' : 'atual') + '" autocomplete="current-password" required style="margin:6px 0"><input class="campo-txt" name="nova" type="password" placeholder="Nova senha (mín. 8)" minlength="8" autocomplete="new-password" required style="margin:6px 0 14px"><button class="btn pri full">Salvar senha</button></form>' +
+  if (t === 'senha' && USR && USR.senha_provisoria) return h + '<div class="ok-box" style="margin-top:14px">✓ Você entrou! Falta só um passo.</div>' +
+    '<h1 style="margin-top:12px">Oi' + (USR.nome ? ', ' + esc(USR.nome.split(' ')[0]) : '') + '! Crie sua senha</h1><p class="mut">A senha que você recebeu era só para o primeiro acesso. Escolha uma senha sua, com pelo menos 8 letras ou números. É com ela que você vai entrar das próximas vezes.</p>' + m +
+    '<form data-f="senha"><input class="campo-txt" name="nova" type="password" placeholder="Sua nova senha" minlength="8" autocomplete="new-password" required style="margin:6px 0"><input class="campo-txt" name="repete" type="password" placeholder="Repita a nova senha" minlength="8" autocomplete="new-password" required style="margin:6px 0">' +
+    mostraSenha() + '<button class="btn pri full">Salvar e começar</button></form></div>';
+  if (t === 'senha') return h + '<h1 style="margin-top:12px">Trocar senha</h1>' + m +
+    '<form data-f="senha"><input class="campo-txt" name="atual" type="password" placeholder="Senha atual" autocomplete="current-password" required style="margin:6px 0"><input class="campo-txt" name="nova" type="password" placeholder="Nova senha (mín. 8)" minlength="8" autocomplete="new-password" required style="margin:6px 0"><input class="campo-txt" name="repete" type="password" placeholder="Repita a nova senha" minlength="8" autocomplete="new-password" required style="margin:6px 0">' + mostraSenha() + '<button class="btn pri full">Salvar senha</button></form>' +
     (USR && !USR.senha_provisoria ? '<p class="nota"><button class="btn lin" data-a="volta-app">Voltar</button></p>' : '') + '</div>';
   return h + '<h1 style="margin-top:10px">Seu personal no bolso.</h1><p class="mut">Entre com seu e-mail e senha.</p>' + m +
-    '<form data-f="entrar"><input class="campo-txt" name="email" type="email" placeholder="E-mail" autocomplete="username" required style="margin:6px 0"><input class="campo-txt" name="senha" type="password" placeholder="Senha" autocomplete="current-password" required style="margin:6px 0 14px"><button class="btn pri full">Entrar</button></form>' +
+    '<form data-f="entrar"><input class="campo-txt" name="email" type="email" placeholder="E-mail" autocomplete="username" autocapitalize="none" value="' + esc(ui.emailDigitado || '') + '" required style="margin:6px 0"><input class="campo-txt" name="senha" type="password" placeholder="Senha" autocomplete="current-password" autocapitalize="none" required style="margin:6px 0">' + mostraSenha() + '<button class="btn pri full">Entrar</button></form>' +
     '<p class="nota">Esqueceu a senha? Peça para quem te cadastrou criar uma nova.</p></div>';
 }
+function mostraSenha() { return '<label class="sm mut" style="display:flex;align-items:center;gap:8px;margin:8px 0 14px"><input type="checkbox" data-a="ver-senha" style="width:18px;height:18px"> Mostrar senha</label>'; }
 function telaLogin(msg) { USR = null; ui.tela = 'login'; ui.msg = msg || ''; ui.sheet = null; desenha(); }
 
 // ===== Desenho =====
@@ -418,6 +423,7 @@ document.addEventListener('click', function (ev) {
   }
   else if (a === 'sair') { API.req('POST', '/api/sair').then(function () { try { localStorage.removeItem(LOCAL); } catch (e) {} st = normaliza(null); telaLogin(''); }); }
   else if (a === 'tela-senha') { ui.sheet = null; ui.msg = ''; ui.tela = 'senha'; desenha(); }
+  else if (a === 'ver-senha') { var f0 = el.closest('form'); f0.querySelectorAll('input[name=senha],input[name=nova],input[name=repete],input[name=atual]').forEach(function (x) { x.type = el.checked ? 'text' : 'password'; }); return; }
   else if (a === 'volta-app') { ui.tela = null; ui.msg = ''; desenha(); }
   else if (a === 'adm-pessoas') carregaPessoas();
   else if (a === 'adm-videos') abreSheet(folhaVideosAdmin());
@@ -469,17 +475,20 @@ document.addEventListener('submit', function (ev) {
   var d = {}; Array.prototype.forEach.call(f.elements, function (i) { if (i.name) d[i.name] = i.value; });
   var bt = f.querySelector('button'); if (bt) { bt.disabled = true; bt.style.opacity = .5; }
   var tipo = f.dataset.f;
+  if (tipo === 'entrar') ui.emailDigitado = d.email;
   if (tipo === 'entrar' || tipo === 'primeiro') {
     API.req('POST', tipo === 'entrar' ? '/api/entrar' : '/api/primeiro-acesso', d).then(function (r) {
       if (r._status !== 200) { ui.msg = r.erro || 'Não deu para entrar.'; desenha(); return; }
       entrou(r.usuario);
     }).catch(function () { ui.msg = 'Sem conexão com o servidor.'; desenha(); });
   } else if (tipo === 'senha') {
+    if (d.nova !== d.repete) { ui.msg = 'As duas senhas não estão iguais. Digite de novo.'; desenha(); return; }
     API.req('POST', '/api/senha', d).then(function (r) {
+      if (r._status === 401) { telaLogin('Entre de novo com o e-mail e a senha que você recebeu.'); return; }
       if (r._status !== 200) { ui.msg = r.erro || 'Não deu para trocar a senha.'; desenha(); return; }
       var era = USR && USR.senha_provisoria; USR = r.usuario; ui.msg = '';
       if (era) entrou(USR); else { ui.tela = null; desenha(); toast('Senha trocada'); }
-    });
+    }).catch(function () { ui.msg = 'Sem conexão com o servidor. Tente de novo.'; desenha(); });
   } else if (tipo === 'nova-pessoa') {
     API.req('POST', '/api/pessoas', d).then(function (r) {
       if (r._status === 200) ui.convite = { nome: d.nome, email: d.email, senha: d.senha };
