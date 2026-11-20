@@ -32,6 +32,17 @@ var PRESETS = {
   nada: { nome: 'Sem aparelho', eq: [] }
 };
 
+// Cuidados: o que muda na ficha quando a pessoa marca um incômodo.
+// evitar = sai da montagem automática e do Trocar; reforco = 2 exercícios no começo de cada treino, leves.
+var CUIDADOS = {
+  quadril: {
+    nome: 'Dor no quadril', curto: 'Quadril',
+    sub: 'Começa cada treino fortalecendo o quadril e tira os exercícios que mais costumam incomodar',
+    evitar: ['agach_livre', 'bulgaro', 'afundo', 'sumo', 'swing', 'elev_pernas', 'elev_pernas_barra'],
+    reforco: ['ponte', 'abducao_deitada', 'caminhada_lateral', 'prancha_lateral', 'abducao_polia', 'coice_caneleira']
+  }
+};
+
 function X(id, n, g, t, lv, eq, m, en, p, e, tempo) {
   return { id: id, n: n, g: g, t: t, lv: lv, eq: eq, m: m, en: en, p: p, e: e, tempo: !!tempo };
 }

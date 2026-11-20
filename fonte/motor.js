@@ -14,8 +14,8 @@ function podeFazer(ex, equip) {
 }
 
 // Lista de candidatos de um grupo, na ordem de prioridade, respeitando aparelhos e nível.
-function candidatos(grupo, equip, nivel, pref) {
-  var ok = EXERCICIOS.filter(function (e) { return e.g === grupo && podeFazer(e, equip); });
+function candidatos(grupo, equip, nivel, pref, fora) {
+  var ok = EXERCICIOS.filter(function (e) { return e.g === grupo && podeFazer(e, equip) && (fora || []).indexOf(e.id) < 0; });
   var noNivel = ok.filter(function (e) { return e.lv <= nivel; });
   var lista = noNivel.length ? noNivel : ok;
   if (pref) {
@@ -42,6 +42,19 @@ function prescricao(ex, objetivo, nivel) {
   return nivel === 1 ? { series: 3, reps: '10–12', min: 10, max: 12, desc: 90 } : { series: 4, reps: '8–10', min: 8, max: 10, desc: 90 };
 }
 
+// Cuidados marcados no perfil (ex.: dor no quadril).
+function cuidadosDe(perfil) { return (perfil.cuidados || []).filter(function (k) { return CUIDADOS[k]; }); }
+function foraPorCuidado(perfil) {
+  var f = []; cuidadosDe(perfil).forEach(function (k) { f = f.concat(CUIDADOS[k].evitar); }); return f;
+}
+// Fortalecimento: leve, poucas séries, descanso curto. Vem antes do treino principal.
+function prescReforco(ex) {
+  return ex.tempo ? { series: 2, reps: '20–30 s', min: 20, max: 30, desc: 30, tempo: true } : { series: 2, reps: '12–15', min: 12, max: 15, desc: 30 };
+}
+function poolReforco(k, equip) {
+  return CUIDADOS[k].reforco.map(function (id) { return EX[id]; }).filter(function (e) { return e && podeFazer(e, equip); });
+}
+
 // Monta a ficha completa. Devolve também os avisos de vaga que ficou sem exercício (nunca some calado).
 function gerarPlano(perfil, variacao) {
   variacao = variacao || 0;
@@ -49,6 +62,7 @@ function gerarPlano(perfil, variacao) {
   var vagas = { 1: 5, 2: 6, 3: 7 }[perfil.nivel];
   var vistos = {};
   var avisos = [];
+  var fora = foraPorCuidado(perfil);
   var dias = chaves.map(function (k, i) {
     var def = D[k];
     var repet = vistos[k] || 0; vistos[k] = repet + 1;
@@ -58,7 +72,7 @@ function gerarPlano(perfil, variacao) {
     var faltou = {};
     def[1].slice(0, vagas).forEach(function (vaga) {
       var p = vaga.split(':');
-      var lista = candidatos(p[0], perfil.equip, perfil.nivel, p[1]);
+      var lista = candidatos(p[0], perfil.equip, perfil.nivel, p[1], fora);
       var livres = lista.filter(function (e) { return usados.indexOf(familia(e.id)) < 0; });
       if (!livres.length) { faltou[p[0]] = true; return; }
       var ex = livres[giro % livres.length];
@@ -70,17 +84,34 @@ function gerarPlano(perfil, variacao) {
       if (!itens.some(function (it) { return EX[it.id].g === g; }))
         avisos.push('Treino ' + String.fromCharCode(65 + i) + ': nenhum exercício de ' + GRUPOS[g].toLowerCase() + ' com os aparelhos marcados.');
     });
+    // cuidado marcado: 2 exercícios de fortalecimento no começo, girando a cada treino
+    cuidadosDe(perfil).forEach(function (c) {
+      var pool = poolReforco(c, perfil.equip).filter(function (e) { return usados.indexOf(familia(e.id)) < 0; });
+      var extra = [];
+      for (var j = 0; j < pool.length && extra.length < 2; j++) extra.push(pool[(i * 2 + giro + j) % pool.length]);
+      extra.reverse().forEach(function (e) { usados.push(familia(e.id)); itens.unshift(Object.assign({ id: e.id, reforco: c }, prescReforco(e))); });
+      if (!extra.length) avisos.push('Treino ' + String.fromCharCode(65 + i) + ': nenhum exercício de fortalecimento do quadril com os aparelhos marcados.');
+    });
     return { letra: String.fromCharCode(65 + i), nome: def[0], itens: itens };
   });
   return { criadoEm: new Date().toISOString(), variacao: variacao, dias: dias, avisos: avisos };
 }
 
 // Outras opções para o mesmo músculo, com os aparelhos da pessoa.
-function alternativas(id, equip, excluir) {
+function alternativas(id, equip, excluir, fora) {
   var ex = EX[id];
   return EXERCICIOS.filter(function (e) {
-    return e.g === ex.g && e.id !== id && podeFazer(e, equip) && (excluir || []).indexOf(e.id) < 0;
+    return e.g === ex.g && e.id !== id && podeFazer(e, equip) && (excluir || []).indexOf(e.id) < 0 && (fora || []).indexOf(e.id) < 0;
   });
+}
+// Troca respeitando o perfil: item de fortalecimento troca por outro de fortalecimento.
+function opcoesTroca(item, perfil, excluir) {
+  if (item.reforco && CUIDADOS[item.reforco]) return poolReforco(item.reforco, perfil.equip).filter(function (e) { return e.id !== item.id && (excluir || []).indexOf(e.id) < 0; });
+  return alternativas(item.id, perfil.equip, excluir, foraPorCuidado(perfil));
+}
+function itemTroca(velho, id, perfil) {
+  var ex = EX[id];
+  return velho.reforco ? Object.assign({ id: id, reforco: velho.reforco }, prescReforco(ex)) : Object.assign({ id: id }, prescricao(ex, perfil.objetivo, perfil.nivel));
 }
 
 function minutosTreino(dia) {

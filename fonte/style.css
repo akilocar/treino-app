@@ -157,3 +157,7 @@ body{background:var(--bg)}
 @media (hover:hover) and (pointer:fine){.chips{flex-wrap:wrap;overflow:visible}}
 .video-serie{margin:12px 0 4px;border-radius:14px;overflow:hidden;background:#000;display:flex;justify-content:center;border:1px solid var(--line)}
 .video-serie video{display:block;height:min(52vh,420px);width:auto;max-width:100%;object-fit:contain}
+
+.tag.cuid{background:rgba(120,180,255,.14);color:#9cc8ff;margin-left:4px}
+.check span{text-align:left}
+a.btn{text-decoration:none;display:flex;align-items:center;justify-content:center}

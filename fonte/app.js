@@ -53,7 +53,9 @@ function telaPerfil() {
     h += '<h1>Qual é o objetivo?</h1><div class="opcoes" style="grid-template-columns:1fr">' +
       Object.keys(OBJ).map(function (k) { return op('objetivo', k, OBJ[k][0], OBJ[k][1]); }).join('') + '</div>' +
       '<h3 style="margin-top:18px">Experiência</h3><div class="opcoes" style="grid-template-columns:1fr">' +
-      [1, 2, 3].map(function (k) { return op('nivel', k, r.sexo === 'M' ? NIV[k][0].replace('ária', 'ário').replace('Avançada', 'Avançado') : NIV[k][0], NIV[k][1]); }).join('') + '</div>';
+      [1, 2, 3].map(function (k) { return op('nivel', k, r.sexo === 'M' ? NIV[k][0].replace('ária', 'ário').replace('Avançada', 'Avançado') : NIV[k][0], NIV[k][1]); }).join('') + '</div>' +
+      '<h3 style="margin-top:18px">Algum cuidado?</h3><p class="mut sm" style="margin:4px 0 8px">Opcional. Marque se sentir algum incômodo.</p>' +
+      Object.keys(CUIDADOS).map(function (k) { var on = (r.cuidados || []).indexOf(k) >= 0; return '<button class="check ' + (on ? 'on' : '') + '" data-a="cuidado" data-v="' + k + '"><i>' + (on ? IC.check : '') + '</i><span><b>' + CUIDADOS[k].nome + '</b><br><span class="xs mut">' + CUIDADOS[k].sub + '</span></span></button>'; }).join('');
   } else {
     h += '<h1>O que tem na sua academia?</h1><p class="mut">O treino usa só esses aparelhos. Faltou algum? O app troca por outro exercício do mesmo músculo.</p>' +
       '<div class="chips">' + Object.keys(PRESETS).map(function (k) { return '<button class="chip" data-a="preset" data-v="' + k + '">' + PRESETS[k].nome + '</button>'; }).join('') + '</div>' +
@@ -93,6 +95,7 @@ function telaHoje() {
   h += '<div class="card"><div style="display:flex;justify-content:space-between;align-items:baseline"><h3>Esta semana</h3><span class="sm"><b>' + treinosSemana(new Date()) + '</b> de ' + st.perfil.dias + '</span></div>' + semanaDots() + '</div>';
   h += '<div class="card"><h3>Antes de começar</h3><p class="sm mut" style="margin:6px 0 0">5 minutos leves de ' + cardios() + ', depois 1 série leve do primeiro exercício com metade da carga.' +
     (st.perfil.objetivo === 'emagrecer' ? ' No final: 20 a 30 minutos de ' + cardios() + ' em ritmo moderado.' : '') + '</p></div>';
+  if (cuidadosDe(st.perfil).indexOf('quadril') >= 0) h += '<div class="card"><h3>Cuidado com o quadril</h3><p class="sm mut" style="margin:6px 0 0">Os 2 primeiros exercícios de cada treino fortalecem o quadril. Faça devagar e com carga leve. O movimento não deve doer: se doer, pare e use <b>Trocar</b>. Se a dor continuar ou piorar, procure um fisioterapeuta ou médico.</p></div>';
   return h;
 }
 function saudacao() { var h = new Date().getHours(); return h < 12 ? 'Bom dia' : h < 18 ? 'Boa tarde' : 'Boa noite'; }
@@ -130,7 +133,7 @@ function telaTreino() {
     var ex = EX[e.id], it = e.item, aberto = t.aberto === i, sobe = sugereSubir(st.historico, it);
     var u = ultimoRegistro(st.historico, e.id);
     h += '<div class="exbox ' + (fim(e) ? 'ok' : '') + '"><button class="exhead" data-a="abre-ex" data-v="' + i + '">' + thumb(e.id) +
-      '<div><div class="nome">' + esc(ex.n) + '</div><div class="mut sm">' + it.series + ' × ' + it.reps + ' · descanso ' + it.desc + ' s</div>' +
+      '<div><div class="nome">' + esc(ex.n) + '</div><div class="mut sm">' + it.series + ' × ' + it.reps + ' · descanso ' + it.desc + ' s</div>' + tagReforco(it) +
       (sobe ? '<span class="tag up">Suba a carga hoje</span>' : u ? '<span class="tag">Última: ' + esc(u.series.filter(function (s) { return s.feito; }).map(function (s) { return s.peso ? s.peso + ' kg' : '–'; }).join(' / ')) + '</span>' : '') +
       '</div></button>';
     if (aberto) {
@@ -149,6 +152,7 @@ function telaTreino() {
   h += '<button class="btn pri full" data-a="finalizar" style="margin-top:10px">Finalizar treino</button>';
   return h;
 }
+function tagReforco(it) { return it.reforco && CUIDADOS[it.reforco] ? '<span class="tag cuid">Fortalecer ' + CUIDADOS[it.reforco].curto.toLowerCase() + '</span>' : ''; }
 function cronometro() { var s = Math.floor((Date.now() - st.treino.inicio) / 1000); return Math.floor(s / 60) + ':' + String(s % 60).padStart(2, '0'); }
 function iniciaDescanso(seg) { descanso = { fim: Date.now() + seg * 1000 }; pintaDescanso(); }
 function pintaDescanso() {
@@ -179,7 +183,7 @@ function telaFicha() {
   h += '<div class="chips" style="margin-top:12px">' + pl.dias.map(function (x, k) { return '<button class="chip ' + (x === d ? 'on' : '') + '" data-a="fichadia" data-v="' + k + '">' + x.letra + ' · ' + esc(x.nome) + '</button>'; }).join('') + '</div>';
   h += '<div class="lista" style="margin-top:8px">' + d.itens.map(function (it, k) {
     var ex = EX[it.id];
-    return '<div class="ex">' + thumb(it.id) + '<button style="text-align:left;padding:0" data-a="detalhe" data-v="' + it.id + '"><div class="nome">' + esc(ex.n) + '</div><div class="mut sm">' + it.series + ' × ' + it.reps + ' · ' + esc(GRUPOS[ex.g]) + '</div></button>' +
+    return '<div class="ex">' + thumb(it.id) + '<button style="text-align:left;padding:0" data-a="detalhe" data-v="' + it.id + '"><div class="nome">' + esc(ex.n) + '</div><div class="mut sm">' + it.series + ' × ' + it.reps + ' · ' + esc(GRUPOS[ex.g]) + '</div>' + tagReforco(it) + '</button>' +
       '<button class="iconbtn" data-a="trocar-ficha" data-k="' + k + '" aria-label="Trocar exercício">' + IC.swap + '</button></div>';
   }).join('') + '</div>';
   h += '<div style="display:flex;gap:10px;margin-top:16px"><button class="btn lin" style="flex:1" data-a="variacao">Gerar variação</button><button class="btn lin" style="flex:1" data-a="refaz">Refazer perfil</button></div>' +
@@ -245,7 +249,7 @@ function painelVideoAdmin(id) {
 }
 function folhaDetalhe(id) {
   var e = EX[id];
-  var alt = alternativas(id, st.perfil.equip);
+  var alt = alternativas(id, st.perfil.equip, null, foraPorCuidado(st.perfil));
   return '<div class="puxa"></div><div style="display:flex;justify-content:space-between;gap:10px"><div><span class="tag">' + esc(GRUPOS[e.g]) + '</span><h2 style="margin-top:6px">' + esc(e.n) + '</h2></div><button class="iconbtn" data-a="fecha" aria-label="Fechar">' + IC.x + '</button></div>' +
     caixaVideo(id) +
     '<div class="sm mut">Músculos: ' + esc(e.m) + ' · ' + (e.eq.length ? esc(e.eq.map(function (a) { return APARELHOS[a]; }).join(', ')) : 'sem aparelho') + '</div>' +
@@ -264,6 +268,7 @@ function folhaAjustes() {
   var nAp = p.equip.filter(function (k) { return APARELHOS[k]; }).length;
   var h = '<div class="puxa"></div><div style="display:flex;justify-content:space-between"><h2>Ajustes</h2><button class="iconbtn" data-a="fecha" aria-label="Fechar">' + IC.x + '</button></div>' +
     '<div class="card"><div class="linha"><span>Nome</span><b>' + esc(p.nome || '—') + '</b></div><div class="linha"><span>Sexo</span><b>' + (p.sexo === 'F' ? 'Mulher' : 'Homem') + '</b></div><div class="linha"><span>Dias por semana</span><b>' + p.dias + '</b></div><div class="linha"><span>Objetivo</span><b>' + OBJ[p.objetivo][0] + '</b></div><div class="linha"><span>Aparelhos</span><b>' + nAp + ' marcados</b></div>' +
+    '<div class="linha"><span>Cuidados</span><b>' + (cuidadosDe(p).map(function (k) { return CUIDADOS[k].nome; }).join(', ') || 'Nenhum') + '</b></div>' +
     '<button class="btn full" data-a="refaz" style="margin-top:8px">Mudar perfil e aparelhos</button></div>' +
     '<div class="card"><h3>Conta</h3><div class="linha"><span>E-mail</span><b>' + esc(USR.email) + '</b></div>' +
     '<div style="display:flex;gap:8px;margin-top:8px"><button class="btn" style="flex:1" data-a="tela-senha">Trocar senha</button><button class="btn lin" style="flex:1" data-a="sair">Sair</button></div></div>';
@@ -276,12 +281,23 @@ function folhaAjustes() {
 function folhaPessoas(lista, msg) {
   return '<div class="puxa"></div><div style="display:flex;justify-content:space-between"><h2>Pessoas</h2><button class="iconbtn" data-a="ajustes" aria-label="Voltar">' + IC.x + '</button></div>' +
     (msg ? '<div class="' + (msg.erro ? 'aviso' : 'ok-box') + '">' + esc(msg.texto) + '</div>' : '') +
+    (msg && msg.convite ? '<div class="card"><h3>Enviar o acesso</h3><p class="sm mut">Mensagem pronta com o link, o e-mail, a senha provisória e como instalar no celular.</p>' +
+      '<a class="btn pri full" href="https://wa.me/?text=' + encodeURIComponent(textoConvite(msg.convite)) + '" target="_blank" rel="noopener" style="margin-bottom:8px">Mandar pelo WhatsApp</a>' +
+      '<button class="btn full" data-a="copia-convite">Copiar mensagem</button></div>' : '') +
     '<div class="card">' + (lista ? lista.map(function (u) {
       return '<div class="linha" style="align-items:center"><span><b>' + esc(u.nome || u.email) + '</b>' + (u.admin ? ' <span class="tag">admin</span>' : '') + '<br><span class="xs mut">' + esc(u.email) + (u.senha_provisoria ? ' · ainda não trocou a senha provisória' : u.ultimo_uso ? ' · usou em ' + u.ultimo_uso.slice(8, 10) + '/' + u.ultimo_uso.slice(5, 7) : '') + '</span></span>' +
-        (u.admin ? '' : '<span style="display:flex;gap:6px"><button class="btn" data-a="adm-reset" data-v="' + u.id + '" data-n="' + esc(u.nome || u.email) + '">Senha</button><button class="iconbtn" data-a="adm-apaga" data-v="' + u.id + '" data-n="' + esc(u.nome || u.email) + '" aria-label="Remover">' + IC.x + '</button></span>') + '</div>';
+        (u.admin ? '' : '<span style="display:flex;gap:6px"><button class="btn" data-a="adm-reset" data-v="' + u.id + '" data-n="' + esc(u.nome || u.email) + '" data-e="' + esc(u.email) + '">Senha</button><button class="iconbtn" data-a="adm-apaga" data-v="' + u.id + '" data-n="' + esc(u.nome || u.email) + '" aria-label="Remover">' + IC.x + '</button></span>') + '</div>';
     }).join('') : '<p class="mut sm">Carregando…</p>') + '</div>' +
     '<div class="card"><h3>Adicionar pessoa</h3><p class="sm mut">Crie uma senha provisória e passe para a pessoa. No primeiro acesso ela troca por uma senha dela.</p>' +
     '<form data-f="nova-pessoa"><input class="campo-txt" name="nome" placeholder="Nome" style="margin:6px 0"><input class="campo-txt" name="email" type="email" placeholder="E-mail" required style="margin:6px 0"><input class="campo-txt" name="senha" placeholder="Senha provisória (mín. 8)" minlength="8" required style="margin:6px 0"><button class="btn pri full">Adicionar</button></form></div>';
+}
+function textoConvite(c) {
+  return 'Oi' + (c.nome ? ', ' + c.nome.split(' ')[0] : '') + '! Criei seu acesso no app de treino.\n\n' +
+    '1. Abra: ' + location.origin + '\n' +
+    '2. Entre com o e-mail ' + c.email + ' e a senha provisória ' + c.senha + '. No primeiro acesso você cria a sua senha.\n' +
+    '3. Para virar app no celular:\n' +
+    '• iPhone: abra o link no Safari, toque em Compartilhar e depois em "Adicionar à Tela de Início".\n' +
+    '• Android: abra no Chrome, toque nos 3 pontinhos e em "Instalar app" (ou "Adicionar à tela inicial").';
 }
 function folhaVideosAdmin() {
   var lst = EXERCICIOS.slice().sort(function (a, b) { return (temVideoDoSexo(a.id, 'F') + temVideoDoSexo(a.id, 'M')) - (temVideoDoSexo(b.id, 'F') + temVideoDoSexo(b.id, 'M')); });
@@ -293,8 +309,8 @@ function folhaVideosAdmin() {
 function folhaConfirma(texto, acao, v) {
   return '<div class="puxa"></div><h2>Tem certeza?</h2><p>' + esc(texto) + '</p><div style="display:flex;gap:10px"><button class="btn lin" style="flex:1" data-a="fecha">Cancelar</button><button class="btn pri" style="flex:1" data-a="' + acao + '" data-v="' + v + '">Confirmar</button></div>';
 }
-function folhaReset(id, nome) {
-  return '<div class="puxa"></div><h2>Nova senha provisória</h2><p class="sm mut">Para ' + esc(nome) + '. Ela vai trocar no próximo acesso.</p><form data-f="reset" data-v="' + id + '"><input class="campo-txt" name="senha" minlength="8" required placeholder="Senha provisória (mín. 8)" style="margin:6px 0 12px"><button class="btn pri full">Salvar</button></form>';
+function folhaReset(id, nome, email) {
+  return '<div class="puxa"></div><h2>Nova senha provisória</h2><p class="sm mut">Para ' + esc(nome) + '. Ela vai trocar no próximo acesso.</p><form data-f="reset" data-v="' + id + '" data-n="' + esc(nome) + '" data-e="' + esc(email || '') + '"><input class="campo-txt" name="senha" minlength="8" required placeholder="Senha provisória (mín. 8)" style="margin:6px 0 12px"><button class="btn pri full">Salvar</button></form>';
 }
 
 // ===== Entrada (login, primeiro acesso, troca de senha) =====
@@ -346,9 +362,9 @@ function escolheFundo() {
 function abreSheet(html) { ui.sheet = html; desenha(); }
 
 // ===== Ações =====
-function novoRascunho() { return st.perfil ? JSON.parse(JSON.stringify(st.perfil)) : { nome: (USR && USR.nome) || '', sexo: null, dias: null, objetivo: null, nivel: null, equip: PRESETS.vivere.eq.slice() }; }
+function novoRascunho() { return st.perfil ? JSON.parse(JSON.stringify(st.perfil)) : { nome: (USR && USR.nome) || '', sexo: null, dias: null, objetivo: null, nivel: null, cuidados: [], equip: PRESETS.vivere.eq.slice() }; }
 function fechaPerfil() {
-  var mudou = !st.perfil || ['sexo', 'dias', 'objetivo', 'nivel'].some(function (k) { return st.perfil[k] !== ui.rasc[k]; }) || st.perfil.equip.join() !== ui.rasc.equip.join();
+  var mudou = !st.perfil || ['sexo', 'dias', 'objetivo', 'nivel'].some(function (k) { return st.perfil[k] !== ui.rasc[k]; }) || st.perfil.equip.join() !== ui.rasc.equip.join() || (st.perfil.cuidados || []).join() !== (ui.rasc.cuidados || []).join();
   st.perfil = ui.rasc; if (mudou) st.plano = gerarPlano(st.perfil, 0);
   salva(); ui.tela = null; ui.tab = 'hoje'; desenha(); window.scrollTo(0, 0);
   if (st.plano.avisos.length) toast('Atenção: veja os avisos na Ficha');
@@ -368,6 +384,7 @@ document.addEventListener('click', function (ev) {
   else if (a === 'avancar') { if (ui.passo === 0) ui.rasc.nome = $('#nome').value.trim(); if (ui.passo < 3) { ui.passo++; desenha(); window.scrollTo(0, 0); } else fechaPerfil(); }
   else if (a === 'voltar') { ui.passo--; desenha(); }
   else if (a === 'preset') { ui.rasc.equip = PRESETS[v].eq.slice(); desenha(); }
+  else if (a === 'cuidado') { var c = ui.rasc.cuidados = ui.rasc.cuidados || [], j = c.indexOf(v); if (j >= 0) c.splice(j, 1); else c.push(v); desenha(); }
   else if (a === 'equip') { var q = ui.rasc.equip, i = q.indexOf(v); if (i >= 0) q.splice(i, 1); else q.push(v); desenha(); }
   else if (a === 'fecha-perfil') { ui.tela = null; desenha(); }
   else if (a === 'escolhe') { ui.escolhido = +v; desenha(); window.scrollTo({ top: 0, behavior: 'smooth' }); }
@@ -382,10 +399,10 @@ document.addEventListener('click', function (ev) {
   }
   else if (a === 'mais15') { if (descanso) { descanso.fim += 15000; descanso.avisou = false; } pintaDescanso(); }
   else if (a === 'pula') { descanso = null; pintaDescanso(); }
-  else if (a === 'trocar') { ui.trocaI = +el.dataset.i; var usados = st.treino.ex.map(function (x) { return x.id; }); abreSheet(folhaTroca(alternativas(st.treino.ex[ui.trocaI].id, st.perfil.equip, usados), 'troca-treino')); }
-  else if (a === 'troca-treino') { var old = st.treino.ex[ui.trocaI]; var it = Object.assign({ id: v }, prescricao(EX[v], st.perfil.objetivo, st.perfil.nivel)); st.treino.ex[ui.trocaI] = novoEx(it); ui.sheet = null; salva(); desenha(); toast(EX[old.id].n + ' → ' + EX[v].n + ' (só hoje)'); }
-  else if (a === 'trocar-ficha') { ui.trocaK = +el.dataset.k; var dia = st.plano.dias[ui.fichaDia]; abreSheet(folhaTroca(alternativas(dia.itens[ui.trocaK].id, st.perfil.equip, dia.itens.map(function (x) { return x.id; })), 'troca-ficha')); }
-  else if (a === 'troca-ficha') { st.plano.dias[ui.fichaDia].itens[ui.trocaK] = Object.assign({ id: v }, prescricao(EX[v], st.perfil.objetivo, st.perfil.nivel)); ui.sheet = null; salva(); desenha(); toast('Ficha atualizada'); }
+  else if (a === 'trocar') { ui.trocaI = +el.dataset.i; var usados = st.treino.ex.map(function (x) { return x.id; }); abreSheet(folhaTroca(opcoesTroca(st.treino.ex[ui.trocaI].item, st.perfil, usados), 'troca-treino')); }
+  else if (a === 'troca-treino') { var old = st.treino.ex[ui.trocaI]; var it = itemTroca(old.item, v, st.perfil); st.treino.ex[ui.trocaI] = novoEx(it); ui.sheet = null; salva(); desenha(); toast(EX[old.id].n + ' → ' + EX[v].n + ' (só hoje)'); }
+  else if (a === 'trocar-ficha') { ui.trocaK = +el.dataset.k; var dia = st.plano.dias[ui.fichaDia]; abreSheet(folhaTroca(opcoesTroca(dia.itens[ui.trocaK], st.perfil, dia.itens.map(function (x) { return x.id; })), 'troca-ficha')); }
+  else if (a === 'troca-ficha') { var dd = st.plano.dias[ui.fichaDia]; dd.itens[ui.trocaK] = itemTroca(dd.itens[ui.trocaK], v, st.perfil); ui.sheet = null; salva(); desenha(); toast('Ficha atualizada'); }
   else if (a === 'finalizar') { if (!st.treino.ex.some(function (x) { return x.series.some(function (s) { return s.feito; }); })) { toast('Marque pelo menos uma série'); return; } finalizar(); }
   else if (a === 'detalhe') abreSheet(folhaDetalhe(v));
   else if (a === 'fecha') { ui.sheet = null; desenha(); }
@@ -404,7 +421,8 @@ document.addEventListener('click', function (ev) {
   else if (a === 'volta-app') { ui.tela = null; ui.msg = ''; desenha(); }
   else if (a === 'adm-pessoas') carregaPessoas();
   else if (a === 'adm-videos') abreSheet(folhaVideosAdmin());
-  else if (a === 'adm-reset') abreSheet(folhaReset(v, el.dataset.n));
+  else if (a === 'adm-reset') abreSheet(folhaReset(v, el.dataset.n, el.dataset.e));
+  else if (a === 'copia-convite') { if (ui.convite) copia(textoConvite(ui.convite)); }
   else if (a === 'adm-apaga') abreSheet(folhaConfirma('Remover ' + el.dataset.n + '? A ficha e o histórico dessa pessoa serão apagados e não dá para desfazer.', 'adm-apaga-ok', v));
   else if (a === 'adm-apaga-ok') API.req('DELETE', '/api/pessoas/' + v).then(function (r) { carregaPessoas(r._status === 200 ? { texto: 'Pessoa removida.' } : { erro: true, texto: r.erro || 'Não deu para remover.' }); });
   else if (a === 'apaga-video') abreSheet(folhaConfirma('Apagar o vídeo de ' + EX[v].n + ' (' + (el.dataset.s === 'F' ? 'mulher' : 'homem') + ')?', 'apaga-video-ok', v + '|' + el.dataset.s));
@@ -464,11 +482,13 @@ document.addEventListener('submit', function (ev) {
     });
   } else if (tipo === 'nova-pessoa') {
     API.req('POST', '/api/pessoas', d).then(function (r) {
-      carregaPessoas(r._status === 200 ? { texto: 'Pronto. Passe para ' + (d.nome || d.email) + ' o endereço do app, o e-mail e a senha provisória.' } : { erro: true, texto: r.erro || 'Não deu para adicionar.' });
+      if (r._status === 200) ui.convite = { nome: d.nome, email: d.email, senha: d.senha };
+      carregaPessoas(r._status === 200 ? { texto: (d.nome || d.email) + ' foi adicionado(a). Agora mande o acesso.', convite: ui.convite } : { erro: true, texto: r.erro || 'Não deu para adicionar.' });
     });
   } else if (tipo === 'reset') {
     API.req('POST', '/api/pessoas/' + f.dataset.v + '/senha', d).then(function (r) {
-      carregaPessoas(r._status === 200 ? { texto: 'Senha provisória salva. Passe para a pessoa.' } : { erro: true, texto: r.erro || 'Não deu para salvar.' });
+      if (r._status === 200 && f.dataset.e) ui.convite = { nome: f.dataset.n, email: f.dataset.e, senha: d.senha };
+      carregaPessoas(r._status === 200 ? { texto: 'Senha provisória salva. Agora mande para a pessoa.', convite: f.dataset.e ? ui.convite : null } : { erro: true, texto: r.erro || 'Não deu para salvar.' });
     });
   }
 });

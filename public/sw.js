@@ -1,5 +1,5 @@
 // Guarda a tela do app para abrir mesmo sem internet. Os dados (/api) e os vídeos nunca são guardados aqui.
-const CACHE = 'treino-20261119-2144';
+const CACHE = 'treino-20261119-2151';
 const ARQUIVOS = ['/', '/manifest.webmanifest', '/icone.svg', '/icone-192.png', '/icone-512.png', '/icone-180.png'].concat(
   ['entrada', 'corpo', 'pernas', 'gluteo', 'costas', 'peito', 'ombros', 'bracos', 'abdomen', 'aparelhos', 'evolucao'].flatMap((n) => ['/fundos/' + n + '.webp', '/fundos/m-' + n + '.webp']));
 self.addEventListener('install', (e) => {
