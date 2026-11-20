@@ -134,6 +134,7 @@ function telaTreino() {
       (sobe ? '<span class="tag up">Suba a carga hoje</span>' : u ? '<span class="tag">Última: ' + esc(u.series.filter(function (s) { return s.feito; }).map(function (s) { return s.peso ? s.peso + ' kg' : '–'; }).join(' / ')) + '</span>' : '') +
       '</div></button>';
     if (aberto) {
+      if (temVideo(e.id)) h += '<div class="video-serie"><video src="' + urlVideo(e.id) + '" data-vid="' + e.id + '" autoplay loop muted playsinline preload="auto"></video></div>';
       h += e.series.map(function (s, k) {
         return '<div class="serie"><div class="n">' + (k + 1) + '</div>' +
           (it.tempo ? '<div class="campo" style="grid-column:span 2"><input inputmode="numeric" value="' + esc(s.reps) + '" data-a="campo" data-i="' + i + '" data-s="' + k + '" data-f="reps" aria-label="Segundos"><span>seg</span></div>'
@@ -315,6 +316,7 @@ function telaLogin(msg) { USR = null; ui.tela = 'login'; ui.msg = msg || ''; ui.
 // ===== Desenho =====
 function desenha() {
   var a = $('#app'), tabs = $('#tabs');
+  var tempos = {}; a.querySelectorAll('video[data-vid]').forEach(function (v) { tempos[v.dataset.vid] = v.currentTime; });
   escolheFundo();
   if (ui.tela === 'carregando') { tabs.hidden = true; a.innerHTML = '<div style="padding-top:30vh;text-align:center" class="mut">Carregando…</div>'; }
   else if (['login', 'primeiro', 'senha'].indexOf(ui.tela) >= 0) { tabs.hidden = true; a.innerHTML = telaEntrada(); }
@@ -328,6 +330,7 @@ function desenha() {
   var ex = $('#extra'); var v = ex.querySelector('.veu');
   if (ui.sheet) { if (!v) { v = document.createElement('div'); v.className = 'veu'; v.dataset.a = 'veu'; ex.appendChild(v); } v.innerHTML = '<div class="folha">' + ui.sheet + '</div>'; }
   else if (v) v.remove();
+  a.querySelectorAll('video[data-vid]').forEach(function (v) { if (tempos[v.dataset.vid]) { try { v.currentTime = tempos[v.dataset.vid]; } catch (e) {} } });
   pintaDescanso(); pintaSinc();
 }
 function escolheFundo() {

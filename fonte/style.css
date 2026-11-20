@@ -153,3 +153,7 @@ body{background:var(--bg)}
 .capa{min-height:100vh;display:flex;flex-direction:column;justify-content:flex-end;padding-bottom:32px}
 .capa h1{font-size:40px}
 @media (prefers-reduced-motion:reduce){.fundo i{transition:opacity .2s;transform:none}}
+/* no computador (mouse) os filtros quebram em linhas; no celular continuam deslizando com o dedo */
+@media (hover:hover) and (pointer:fine){.chips{flex-wrap:wrap;overflow:visible}}
+.video-serie{margin:12px 0 4px;border-radius:14px;overflow:hidden;background:#000;display:flex;justify-content:center;border:1px solid var(--line)}
+.video-serie video{display:block;height:min(52vh,420px);width:auto;max-width:100%;object-fit:contain}
