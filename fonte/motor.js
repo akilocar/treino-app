@@ -5,7 +5,9 @@ var FAMILIA = {
   elev_pelvica_maq: 'hip', elev_pelvica: 'hip', elev_pelvica_h: 'hip', stiff: 'stiff', stiff_barra: 'stiff',
   supino_halter: 'sup', supino_barra: 'sup', supino_maq: 'sup', desenv_halter: 'des', desenv_maq: 'des',
   puxada_frente: 'pux', graviton: 'pux', barra_fixa: 'pux', mesa_flexora: 'flex', cadeira_flexora: 'flex', flexora_polia: 'flex',
-  agach_livre: 'agach', agach_smith: 'agach', hack: 'agach', agach_corpo: 'agach', goblet: 'agach'
+  agach_livre: 'agach', agach_smith: 'agach', hack: 'agach', agach_corpo: 'agach', goblet: 'agach',
+  elev_lateral: 'elat', elev_lateral_polia: 'elat', elev_lateral_elastico: 'elat',
+  crucifixo_inverso: 'post', voador_inverso: 'post', rot_externa_elastico: 'rotext', rot_externa_deitada: 'rotext'
 };
 function familia(id) { return FAMILIA[id] || id; }
 
@@ -15,7 +17,7 @@ function podeFazer(ex, equip) {
 
 // Lista de candidatos de um grupo, na ordem de prioridade, respeitando aparelhos e nível.
 function candidatos(grupo, equip, nivel, pref, fora) {
-  var ok = EXERCICIOS.filter(function (e) { return e.g === grupo && podeFazer(e, equip) && (fora || []).indexOf(e.id) < 0; });
+  var ok = EXERCICIOS.filter(function (e) { return e.g === grupo && !e.so && podeFazer(e, equip) && (fora || []).indexOf(e.id) < 0; });
   var noNivel = ok.filter(function (e) { return e.lv <= nivel; });
   var lista = noNivel.length ? noNivel : ok;
   if (pref) {
@@ -85,13 +87,18 @@ function gerarPlano(perfil, variacao) {
         avisos.push('Treino ' + String.fromCharCode(65 + i) + ': nenhum exercício de ' + GRUPOS[g].toLowerCase() + ' com os aparelhos marcados.');
     });
     // cuidado marcado: 2 exercícios de fortalecimento no começo, girando a cada treino
-    cuidadosDe(perfil).forEach(function (c) {
+    var cs = cuidadosDe(perfil), porCuidado = cs.length <= 2 ? 2 : 1, bloco = [];
+    cs.forEach(function (c) {
       var pool = poolReforco(c, perfil.equip).filter(function (e) { return usados.indexOf(familia(e.id)) < 0; });
       var extra = [];
-      for (var j = 0; j < pool.length && extra.length < 2; j++) extra.push(pool[(i * 2 + giro + j) % pool.length]);
-      extra.reverse().forEach(function (e) { usados.push(familia(e.id)); itens.unshift(Object.assign({ id: e.id, reforco: c }, prescReforco(e))); });
-      if (!extra.length) avisos.push('Treino ' + String.fromCharCode(65 + i) + ': nenhum exercício de fortalecimento do quadril com os aparelhos marcados.');
+      for (var j = 0; j < pool.length && extra.length < porCuidado; j++) {
+        var e = pool[(i * porCuidado + giro + j) % pool.length];
+        if (extra.indexOf(e) < 0 && usados.indexOf(familia(e.id)) < 0) { extra.push(e); usados.push(familia(e.id)); }
+      }
+      extra.forEach(function (e) { bloco.push(Object.assign({ id: e.id, reforco: c }, prescReforco(e))); });
+      if (!extra.length) avisos.push('Treino ' + String.fromCharCode(65 + i) + ': nenhum exercício de fortalecimento (' + CUIDADOS[c].curto.toLowerCase() + ') com os aparelhos marcados.');
     });
+    itens = bloco.concat(itens);
     return { letra: String.fromCharCode(65 + i), nome: def[0], itens: itens };
   });
   return { criadoEm: new Date().toISOString(), variacao: variacao, dias: dias, avisos: avisos };
@@ -101,7 +108,7 @@ function gerarPlano(perfil, variacao) {
 function alternativas(id, equip, excluir, fora) {
   var ex = EX[id];
   return EXERCICIOS.filter(function (e) {
-    return e.g === ex.g && e.id !== id && podeFazer(e, equip) && (excluir || []).indexOf(e.id) < 0 && (fora || []).indexOf(e.id) < 0;
+    return e.g === ex.g && e.id !== id && !e.so && podeFazer(e, equip) && (excluir || []).indexOf(e.id) < 0 && (fora || []).indexOf(e.id) < 0;
   });
 }
 // Troca respeitando o perfil: item de fortalecimento troca por outro de fortalecimento.

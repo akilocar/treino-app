@@ -95,7 +95,10 @@ function telaHoje() {
   h += '<div class="card"><div style="display:flex;justify-content:space-between;align-items:baseline"><h3>Esta semana</h3><span class="sm"><b>' + treinosSemana(new Date()) + '</b> de ' + st.perfil.dias + '</span></div>' + semanaDots() + '</div>';
   h += '<div class="card"><h3>Antes de começar</h3><p class="sm mut" style="margin:6px 0 0">5 minutos leves de ' + cardios() + ', depois 1 série leve do primeiro exercício com metade da carga.' +
     (st.perfil.objetivo === 'emagrecer' ? ' No final: 20 a 30 minutos de ' + cardios() + ' em ritmo moderado.' : '') + '</p></div>';
-  if (cuidadosDe(st.perfil).indexOf('quadril') >= 0) h += '<div class="card"><h3>Cuidado com o quadril</h3><p class="sm mut" style="margin:6px 0 0">Os 2 primeiros exercícios de cada treino fortalecem o quadril. Faça devagar e com carga leve. O movimento não deve doer: se doer, pare e use <b>Trocar</b>. Se a dor continuar ou piorar, procure um fisioterapeuta ou médico.</p></div>';
+  var cs = cuidadosDe(st.perfil);
+  if (cs.length) h += '<div class="card"><h3>Cuidado com ' + listaE(cs.map(function (k) { return 'o ' + CUIDADOS[k].curto.toLowerCase(); })) + '</h3><p class="sm mut" style="margin:6px 0 0">Os primeiros exercícios de cada treino (etiqueta azul) são de fortalecimento. Faça devagar e com carga leve' +
+    cs.filter(function (k) { return CUIDADOS[k].dica; }).map(function (k) { return '; ' + CUIDADOS[k].curto.toLowerCase() + ': ' + CUIDADOS[k].dica; }).join('') +
+    '. O movimento não deve doer: se doer, pare e use <b>Trocar</b>. Se a dor continuar ou piorar, procure um fisioterapeuta ou médico.</p></div>';
   return h;
 }
 function saudacao() { var h = new Date().getHours(); return h < 12 ? 'Bom dia' : h < 18 ? 'Boa tarde' : 'Boa noite'; }
@@ -152,6 +155,7 @@ function telaTreino() {
   h += '<button class="btn pri full" data-a="finalizar" style="margin-top:10px">Finalizar treino</button>';
   return h;
 }
+function listaE(l) { return l.length < 2 ? l.join('') : l.slice(0, -1).join(', ') + ' e ' + l[l.length - 1]; }
 function tagReforco(it) { return it.reforco && CUIDADOS[it.reforco] ? '<span class="tag cuid">Fortalecer ' + CUIDADOS[it.reforco].curto.toLowerCase() + '</span>' : ''; }
 function cronometro() { var s = Math.floor((Date.now() - st.treino.inicio) / 1000); return Math.floor(s / 60) + ':' + String(s % 60).padStart(2, '0'); }
 // ===== tela sempre ligada durante o treino =====

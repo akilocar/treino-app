@@ -198,7 +198,7 @@ a.btn{text-decoration:none;display:flex;align-items:center;justify-content:cente
 <div id="extra"></div>
 <div id="sinc" class="sinc" hidden></div>
 <script>
-  var VERSAO = "20261121-1841";
+  var VERSAO = "20261121-1845";
   var VIDEOS_PADRAO = ["abd_declinado-F", "abd_supra-F", "abducao_deitada-F", "abducao_maq-F", "abducao_polia-F", "aducao_maq-F", "afundo-F", "agach_corpo-F", "agach_livre-F", "agach_smith-F", "barra_fixa-F", "bicicleta-F", "bulgaro-F", "cadeira_ext-F", "cadeira_flexora-F", "caminhada_lateral-F", "coice_caneleira-F", "coice_polia-F", "crossover-F", "crucifixo-F", "crucifixo_inverso-F", "desenv_halter-F", "desenv_maq-F", "elev_frontal-F", "elev_lateral-F", "elev_lateral_elastico-F", "elev_lateral_polia-F", "elev_pelvica-F", "elev_pelvica_h-F", "elev_pelvica_maq-F", "elev_pernas-F", "elev_pernas_barra-F", "face_pull-F", "flexao-F", "flexora_polia-F", "goblet-F", "leg45-F", "mergulho_banco-F", "pant_degrau-F", "pant_legpress-F", "pant_sentado-F", "ponte-F", "prancha-F", "prancha_lateral-F", "pulldown_reto-F", "puxada_frente-F", "puxada_triangulo-F", "remada_baixa-F", "remada_curvada-F", "remada_elastico-F", "remada_unilateral-F", "roda_abd-F", "rosca_alternada-F", "rosca_direta-F", "rosca_elastico-F", "rosca_martelo-F", "rosca_polia-F", "rosca_scott-F", "step_up-F", "stiff-F", "stiff_barra-F", "stiff_unilateral-F", "sumo-F", "supino_barra-F", "supino_halter-F", "supino_incl-F", "swing-F", "triceps_coice-F", "triceps_frances-F", "triceps_polia-F", "triceps_testa-F", "voador-F", "voador_inverso-F"];
 // ===== Biblioteca de exercícios, aparelhos e divisões de treino =====
 // Cada exercício: id, nome, grupo, tipo (c = composto / i = isolado), nível mínimo (1-3),
@@ -242,6 +242,20 @@ var CUIDADOS = {
     sub: 'Começa cada treino fortalecendo o quadril e tira os exercícios que mais costumam incomodar',
     evitar: ['agach_livre', 'bulgaro', 'afundo', 'sumo', 'swing', 'elev_pernas', 'elev_pernas_barra'],
     reforco: ['ponte', 'abducao_deitada', 'caminhada_lateral', 'prancha_lateral', 'abducao_polia', 'coice_caneleira']
+  },
+  ombro: {
+    nome: 'Dor no ombro', curto: 'Ombro',
+    sub: 'Fortalece o manguito rotador (tendinite, supraespinhal) e tira os exercícios com braço acima da cabeça ou pendurado',
+    evitar: ['desenv_halter', 'desenv_maq', 'mergulho_banco', 'triceps_frances', 'supino_barra', 'barra_fixa', 'elev_pernas_barra', 'elev_frontal'],
+    reforco: ['rot_externa_elastico', 'rot_externa_deitada', 'elev_escapular', 'face_pull', 'remada_elastico'],
+    dica: 'carga bem leve e o braço nunca acima da linha do ombro'
+  },
+  joelho: {
+    nome: 'Dor no joelho', curto: 'Joelho',
+    sub: 'Fortalece coxa e quadril sem forçar o joelho e tira os exercícios de maior impacto nele',
+    evitar: ['agach_livre', 'bulgaro', 'afundo', 'step_up', 'sumo'],
+    reforco: ['elev_perna_estendida', 'isometria_parede', 'ponte', 'abducao_deitada', 'caminhada_lateral'],
+    dica: 'nos exercícios de perna, desça só até onde não doer'
   }
 };
 
@@ -510,6 +524,25 @@ var EXERCICIOS = [
     'Quadril caindo.', true)
 ];
 
+// Exercícios só de fortalecimento: entram apenas no bloco de cuidados, nunca na montagem normal.
+[
+  X('rot_externa_elastico', 'Rotação externa com elástico', 'ombro_post', 'i', 1, ['elastico'], 'Manguito rotador (parte de trás do ombro)', 'shoulder external rotation with resistance band',
+    ['Prenda o elástico na altura do cotovelo, de lado para o ponto de apoio.', 'Cotovelo colado na cintura, dobrado a 90°, antebraço à frente da barriga.', 'Gire o antebraço para fora, sem descolar o cotovelo.', 'Volte devagar. Carga leve: não pode doer.'],
+    'Descolar o cotovelo do corpo ou usar um elástico forte demais.'),
+  X('rot_externa_deitada', 'Rotação externa deitada com halter', 'ombro_post', 'i', 1, ['halteres'], 'Manguito rotador (parte de trás do ombro)', 'side-lying dumbbell shoulder external rotation',
+    ['Deite de lado, com uma toalha dobrada entre o cotovelo de cima e a cintura.', 'Halter bem leve na mão de cima, cotovelo dobrado a 90°.', 'Gire o antebraço para cima, sem tirar o cotovelo do lugar.', 'Desça devagar.'],
+    'Peso alto demais e o cotovelo saindo da cintura.'),
+  X('elev_escapular', 'Elevação em Y com polegar para cima', 'ombro', 'i', 1, ['halteres'], 'Supraespinhal e meio do ombro', 'scaption raise with thumbs up',
+    ['Em pé, halteres bem leves, polegares apontando para cima.', 'Braços um pouco à frente do corpo, formando um V.', 'Suba os braços esticados até a altura dos ombros, sem passar dela.', 'Desça devagar.'],
+    'Subir acima da linha dos ombros ou encolher os ombros.'),
+  X('elev_perna_estendida', 'Elevação da perna esticada deitada', 'quadriceps', 'i', 1, [], 'Quadríceps sem forçar o joelho', 'straight leg raise lying on the floor',
+    ['Deite de barriga para cima, uma perna dobrada com o pé no chão.', 'A outra perna esticada, com a coxa contraída e o pé apontando para cima.', 'Suba a perna esticada até a altura do outro joelho.', 'Desça devagar, sem encostar o pé no chão entre as repetições.'],
+    'Dobrar o joelho que sobe ou arquear a lombar.'),
+  X('isometria_parede', 'Agachamento parado na parede', 'quadriceps', 'i', 1, [], 'Quadríceps', 'wall sit isometric hold',
+    ['Costas apoiadas na parede, pés um passo à frente, na largura do quadril.', 'Escorregue até os joelhos dobrarem só um pouco (cerca de 45°), sem dor.', 'Segure parada, joelhos apontando para os pés.', 'Suba escorregando pela parede.'],
+    'Descer demais ou deixar os joelhos irem para dentro.', true)
+].forEach(function (e) { e.so = 'reforco'; EXERCICIOS.push(e); });
+
 var EX = {};
 EXERCICIOS.forEach(function (e) { EX[e.id] = e; });
 
@@ -548,7 +581,9 @@ var FAMILIA = {
   elev_pelvica_maq: 'hip', elev_pelvica: 'hip', elev_pelvica_h: 'hip', stiff: 'stiff', stiff_barra: 'stiff',
   supino_halter: 'sup', supino_barra: 'sup', supino_maq: 'sup', desenv_halter: 'des', desenv_maq: 'des',
   puxada_frente: 'pux', graviton: 'pux', barra_fixa: 'pux', mesa_flexora: 'flex', cadeira_flexora: 'flex', flexora_polia: 'flex',
-  agach_livre: 'agach', agach_smith: 'agach', hack: 'agach', agach_corpo: 'agach', goblet: 'agach'
+  agach_livre: 'agach', agach_smith: 'agach', hack: 'agach', agach_corpo: 'agach', goblet: 'agach',
+  elev_lateral: 'elat', elev_lateral_polia: 'elat', elev_lateral_elastico: 'elat',
+  crucifixo_inverso: 'post', voador_inverso: 'post', rot_externa_elastico: 'rotext', rot_externa_deitada: 'rotext'
 };
 function familia(id) { return FAMILIA[id] || id; }
 
@@ -558,7 +593,7 @@ function podeFazer(ex, equip) {
 
 // Lista de candidatos de um grupo, na ordem de prioridade, respeitando aparelhos e nível.
 function candidatos(grupo, equip, nivel, pref, fora) {
-  var ok = EXERCICIOS.filter(function (e) { return e.g === grupo && podeFazer(e, equip) && (fora || []).indexOf(e.id) < 0; });
+  var ok = EXERCICIOS.filter(function (e) { return e.g === grupo && !e.so && podeFazer(e, equip) && (fora || []).indexOf(e.id) < 0; });
   var noNivel = ok.filter(function (e) { return e.lv <= nivel; });
   var lista = noNivel.length ? noNivel : ok;
   if (pref) {
@@ -628,13 +663,18 @@ function gerarPlano(perfil, variacao) {
         avisos.push('Treino ' + String.fromCharCode(65 + i) + ': nenhum exercício de ' + GRUPOS[g].toLowerCase() + ' com os aparelhos marcados.');
     });
     // cuidado marcado: 2 exercícios de fortalecimento no começo, girando a cada treino
-    cuidadosDe(perfil).forEach(function (c) {
+    var cs = cuidadosDe(perfil), porCuidado = cs.length <= 2 ? 2 : 1, bloco = [];
+    cs.forEach(function (c) {
       var pool = poolReforco(c, perfil.equip).filter(function (e) { return usados.indexOf(familia(e.id)) < 0; });
       var extra = [];
-      for (var j = 0; j < pool.length && extra.length < 2; j++) extra.push(pool[(i * 2 + giro + j) % pool.length]);
-      extra.reverse().forEach(function (e) { usados.push(familia(e.id)); itens.unshift(Object.assign({ id: e.id, reforco: c }, prescReforco(e))); });
-      if (!extra.length) avisos.push('Treino ' + String.fromCharCode(65 + i) + ': nenhum exercício de fortalecimento do quadril com os aparelhos marcados.');
+      for (var j = 0; j < pool.length && extra.length < porCuidado; j++) {
+        var e = pool[(i * porCuidado + giro + j) % pool.length];
+        if (extra.indexOf(e) < 0 && usados.indexOf(familia(e.id)) < 0) { extra.push(e); usados.push(familia(e.id)); }
+      }
+      extra.forEach(function (e) { bloco.push(Object.assign({ id: e.id, reforco: c }, prescReforco(e))); });
+      if (!extra.length) avisos.push('Treino ' + String.fromCharCode(65 + i) + ': nenhum exercício de fortalecimento (' + CUIDADOS[c].curto.toLowerCase() + ') com os aparelhos marcados.');
     });
+    itens = bloco.concat(itens);
     return { letra: String.fromCharCode(65 + i), nome: def[0], itens: itens };
   });
   return { criadoEm: new Date().toISOString(), variacao: variacao, dias: dias, avisos: avisos };
@@ -644,7 +684,7 @@ function gerarPlano(perfil, variacao) {
 function alternativas(id, equip, excluir, fora) {
   var ex = EX[id];
   return EXERCICIOS.filter(function (e) {
-    return e.g === ex.g && e.id !== id && podeFazer(e, equip) && (excluir || []).indexOf(e.id) < 0 && (fora || []).indexOf(e.id) < 0;
+    return e.g === ex.g && e.id !== id && !e.so && podeFazer(e, equip) && (excluir || []).indexOf(e.id) < 0 && (fora || []).indexOf(e.id) < 0;
   });
 }
 // Troca respeitando o perfil: item de fortalecimento troca por outro de fortalecimento.
@@ -928,7 +968,10 @@ function telaHoje() {
   h += '<div class="card"><div style="display:flex;justify-content:space-between;align-items:baseline"><h3>Esta semana</h3><span class="sm"><b>' + treinosSemana(new Date()) + '</b> de ' + st.perfil.dias + '</span></div>' + semanaDots() + '</div>';
   h += '<div class="card"><h3>Antes de começar</h3><p class="sm mut" style="margin:6px 0 0">5 minutos leves de ' + cardios() + ', depois 1 série leve do primeiro exercício com metade da carga.' +
     (st.perfil.objetivo === 'emagrecer' ? ' No final: 20 a 30 minutos de ' + cardios() + ' em ritmo moderado.' : '') + '</p></div>';
-  if (cuidadosDe(st.perfil).indexOf('quadril') >= 0) h += '<div class="card"><h3>Cuidado com o quadril</h3><p class="sm mut" style="margin:6px 0 0">Os 2 primeiros exercícios de cada treino fortalecem o quadril. Faça devagar e com carga leve. O movimento não deve doer: se doer, pare e use <b>Trocar</b>. Se a dor continuar ou piorar, procure um fisioterapeuta ou médico.</p></div>';
+  var cs = cuidadosDe(st.perfil);
+  if (cs.length) h += '<div class="card"><h3>Cuidado com ' + listaE(cs.map(function (k) { return 'o ' + CUIDADOS[k].curto.toLowerCase(); })) + '</h3><p class="sm mut" style="margin:6px 0 0">Os primeiros exercícios de cada treino (etiqueta azul) são de fortalecimento. Faça devagar e com carga leve' +
+    cs.filter(function (k) { return CUIDADOS[k].dica; }).map(function (k) { return '; ' + CUIDADOS[k].curto.toLowerCase() + ': ' + CUIDADOS[k].dica; }).join('') +
+    '. O movimento não deve doer: se doer, pare e use <b>Trocar</b>. Se a dor continuar ou piorar, procure um fisioterapeuta ou médico.</p></div>';
   return h;
 }
 function saudacao() { var h = new Date().getHours(); return h < 12 ? 'Bom dia' : h < 18 ? 'Boa tarde' : 'Boa noite'; }
@@ -985,6 +1028,7 @@ function telaTreino() {
   h += '<button class="btn pri full" data-a="finalizar" style="margin-top:10px">Finalizar treino</button>';
   return h;
 }
+function listaE(l) { return l.length < 2 ? l.join('') : l.slice(0, -1).join(', ') + ' e ' + l[l.length - 1]; }
 function tagReforco(it) { return it.reforco && CUIDADOS[it.reforco] ? '<span class="tag cuid">Fortalecer ' + CUIDADOS[it.reforco].curto.toLowerCase() + '</span>' : ''; }
 function cronometro() { var s = Math.floor((Date.now() - st.treino.inicio) / 1000); return Math.floor(s / 60) + ':' + String(s % 60).padStart(2, '0'); }
 // ===== tela sempre ligada durante o treino =====

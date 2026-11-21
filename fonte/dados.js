@@ -40,6 +40,20 @@ var CUIDADOS = {
     sub: 'Começa cada treino fortalecendo o quadril e tira os exercícios que mais costumam incomodar',
     evitar: ['agach_livre', 'bulgaro', 'afundo', 'sumo', 'swing', 'elev_pernas', 'elev_pernas_barra'],
     reforco: ['ponte', 'abducao_deitada', 'caminhada_lateral', 'prancha_lateral', 'abducao_polia', 'coice_caneleira']
+  },
+  ombro: {
+    nome: 'Dor no ombro', curto: 'Ombro',
+    sub: 'Fortalece o manguito rotador (tendinite, supraespinhal) e tira os exercícios com braço acima da cabeça ou pendurado',
+    evitar: ['desenv_halter', 'desenv_maq', 'mergulho_banco', 'triceps_frances', 'supino_barra', 'barra_fixa', 'elev_pernas_barra', 'elev_frontal'],
+    reforco: ['rot_externa_elastico', 'rot_externa_deitada', 'elev_escapular', 'face_pull', 'remada_elastico'],
+    dica: 'carga bem leve e o braço nunca acima da linha do ombro'
+  },
+  joelho: {
+    nome: 'Dor no joelho', curto: 'Joelho',
+    sub: 'Fortalece coxa e quadril sem forçar o joelho e tira os exercícios de maior impacto nele',
+    evitar: ['agach_livre', 'bulgaro', 'afundo', 'step_up', 'sumo'],
+    reforco: ['elev_perna_estendida', 'isometria_parede', 'ponte', 'abducao_deitada', 'caminhada_lateral'],
+    dica: 'nos exercícios de perna, desça só até onde não doer'
   }
 };
 
@@ -307,6 +321,25 @@ var EXERCICIOS = [
     ['Deitada de lado, antebraço no chão abaixo do ombro.', 'Suba o quadril até o corpo ficar reto.', 'Segure e troque de lado.'],
     'Quadril caindo.', true)
 ];
+
+// Exercícios só de fortalecimento: entram apenas no bloco de cuidados, nunca na montagem normal.
+[
+  X('rot_externa_elastico', 'Rotação externa com elástico', 'ombro_post', 'i', 1, ['elastico'], 'Manguito rotador (parte de trás do ombro)', 'shoulder external rotation with resistance band',
+    ['Prenda o elástico na altura do cotovelo, de lado para o ponto de apoio.', 'Cotovelo colado na cintura, dobrado a 90°, antebraço à frente da barriga.', 'Gire o antebraço para fora, sem descolar o cotovelo.', 'Volte devagar. Carga leve: não pode doer.'],
+    'Descolar o cotovelo do corpo ou usar um elástico forte demais.'),
+  X('rot_externa_deitada', 'Rotação externa deitada com halter', 'ombro_post', 'i', 1, ['halteres'], 'Manguito rotador (parte de trás do ombro)', 'side-lying dumbbell shoulder external rotation',
+    ['Deite de lado, com uma toalha dobrada entre o cotovelo de cima e a cintura.', 'Halter bem leve na mão de cima, cotovelo dobrado a 90°.', 'Gire o antebraço para cima, sem tirar o cotovelo do lugar.', 'Desça devagar.'],
+    'Peso alto demais e o cotovelo saindo da cintura.'),
+  X('elev_escapular', 'Elevação em Y com polegar para cima', 'ombro', 'i', 1, ['halteres'], 'Supraespinhal e meio do ombro', 'scaption raise with thumbs up',
+    ['Em pé, halteres bem leves, polegares apontando para cima.', 'Braços um pouco à frente do corpo, formando um V.', 'Suba os braços esticados até a altura dos ombros, sem passar dela.', 'Desça devagar.'],
+    'Subir acima da linha dos ombros ou encolher os ombros.'),
+  X('elev_perna_estendida', 'Elevação da perna esticada deitada', 'quadriceps', 'i', 1, [], 'Quadríceps sem forçar o joelho', 'straight leg raise lying on the floor',
+    ['Deite de barriga para cima, uma perna dobrada com o pé no chão.', 'A outra perna esticada, com a coxa contraída e o pé apontando para cima.', 'Suba a perna esticada até a altura do outro joelho.', 'Desça devagar, sem encostar o pé no chão entre as repetições.'],
+    'Dobrar o joelho que sobe ou arquear a lombar.'),
+  X('isometria_parede', 'Agachamento parado na parede', 'quadriceps', 'i', 1, [], 'Quadríceps', 'wall sit isometric hold',
+    ['Costas apoiadas na parede, pés um passo à frente, na largura do quadril.', 'Escorregue até os joelhos dobrarem só um pouco (cerca de 45°), sem dor.', 'Segure parada, joelhos apontando para os pés.', 'Suba escorregando pela parede.'],
+    'Descer demais ou deixar os joelhos irem para dentro.', true)
+].forEach(function (e) { e.so = 'reforco'; EXERCICIOS.push(e); });
 
 var EX = {};
 EXERCICIOS.forEach(function (e) { EX[e.id] = e; });
