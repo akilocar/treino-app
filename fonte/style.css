@@ -161,3 +161,6 @@ body{background:var(--bg)}
 .tag.cuid{background:rgba(120,180,255,.14);color:#9cc8ff;margin-left:4px}
 .check span{text-align:left}
 a.btn{text-decoration:none;display:flex;align-items:center;justify-content:center}
+
+.descanso.fim{border-color:var(--acc);animation:pulsa .6s ease-in-out 5 alternate}
+@keyframes pulsa{from{box-shadow:0 0 0 rgba(198,255,61,0)}to{box-shadow:0 0 40px rgba(198,255,61,.85);transform:translateX(-50%) scale(1.03)}}

@@ -154,14 +154,74 @@ function telaTreino() {
 }
 function tagReforco(it) { return it.reforco && CUIDADOS[it.reforco] ? '<span class="tag cuid">Fortalecer ' + CUIDADOS[it.reforco].curto.toLowerCase() + '</span>' : ''; }
 function cronometro() { var s = Math.floor((Date.now() - st.treino.inicio) / 1000); return Math.floor(s / 60) + ':' + String(s % 60).padStart(2, '0'); }
+// ===== tela sempre ligada durante o treino =====
+// Wake Lock do navegador (Android Chrome, iPhone com iOS 16.4+). Se não houver ou falhar, um vídeo
+// invisível em loop segura a tela. No iPhone instalado na tela de início usa os dois.
+var acordado = { quer: false, trava: null, pedindo: false, video: null };
+var IOS_APP = !!window.navigator.standalone;
+function telaLigada(quer) { acordado.quer = !!quer; if (acordado.quer) pedeTela(); else soltaTela(); }
+function pedeTela() {
+  if (!acordado.quer || document.visibilityState !== 'visible') return;
+  if (IOS_APP || !('wakeLock' in navigator)) videoAcordado(true);
+  if (!('wakeLock' in navigator) || acordado.trava || acordado.pedindo) return;
+  acordado.pedindo = true;
+  navigator.wakeLock.request('screen').then(function (t) {
+    acordado.pedindo = false; acordado.trava = t;
+    t.addEventListener('release', function () { acordado.trava = null; });
+    if (!acordado.quer) soltaTela();
+  }).catch(function () { acordado.pedindo = false; videoAcordado(true); });
+}
+function soltaTela() { if (acordado.trava) { try { acordado.trava.release(); } catch (e) {} acordado.trava = null; } videoAcordado(false); }
+function videoAcordado(liga) {
+  if (!liga) { if (acordado.video) acordado.video.pause(); return; }
+  if (!acordado.video) {
+    var v = document.createElement('video'); v.src = '/acordado.mp4'; v.loop = true; v.muted = true;
+    v.setAttribute('muted', ''); v.setAttribute('playsinline', ''); v.setAttribute('aria-hidden', 'true');
+    v.style.cssText = 'position:fixed;left:0;bottom:0;width:2px;height:2px;opacity:.01;pointer-events:none;z-index:-1';
+    document.body.appendChild(v); acordado.video = v;
+  }
+  var p = acordado.video.play(); if (p && p.catch) p.catch(function () {});
+}
+document.addEventListener('visibilitychange', function () { if (document.visibilityState === 'visible') pedeTela(); });
+
+// ===== som do descanso =====
+// iPhone só libera som depois de um toque: o contexto de áudio é criado/destravado no toque que inicia o descanso.
+var som = { ctx: null };
+function somLigado() { try { return localStorage.getItem('treino.som') !== '0'; } catch (e) { return true; } }
+function preparaSom() {
+  try {
+    var C = window.AudioContext || window.webkitAudioContext; if (!C) return;
+    if (!som.ctx) som.ctx = new C();
+    if (som.ctx.state !== 'running') som.ctx.resume();
+    var b = som.ctx.createBuffer(1, 1, 22050), s = som.ctx.createBufferSource(); s.buffer = b; s.connect(som.ctx.destination); s.start(0);
+  } catch (e) {}
+}
+function bipe(notas) {
+  if (!somLigado() || !som.ctx) return;
+  try {
+    var c = som.ctx; if (c.state !== 'running') c.resume();
+    var t = c.currentTime + 0.03;
+    notas.forEach(function (n) {
+      var o = c.createOscillator(), g = c.createGain(); o.type = 'sine'; o.frequency.value = n[0];
+      g.gain.setValueAtTime(0.0001, t + n[1]); g.gain.exponentialRampToValueAtTime(0.7, t + n[1] + 0.015); g.gain.exponentialRampToValueAtTime(0.0001, t + n[1] + n[2]);
+      o.connect(g); g.connect(c.destination); o.start(t + n[1]); o.stop(t + n[1] + n[2] + 0.05);
+    });
+  } catch (e) {}
+}
+function bipeContagem() { bipe([[740, 0, 0.12]]); }
+function bipeFim() { bipe([[988, 0, 0.16], [988, 0.22, 0.16], [1318, 0.44, 0.6]]); }
+
 function iniciaDescanso(seg) { descanso = { fim: Date.now() + seg * 1000 }; pintaDescanso(); }
 function pintaDescanso() {
   var el = $('#extra .descanso');
   if (!descanso || ui.tela !== 'treino') { if (el) el.remove(); return; }
   var r = Math.max(0, Math.ceil((descanso.fim - Date.now()) / 1000));
   if (!el) { el = document.createElement('div'); el.className = 'descanso'; $('#extra').appendChild(el); }
-  el.innerHTML = '<div><div class="xs" style="opacity:.7">' + (r ? 'Descanso' : 'Bora!') + '</div><div class="t">' + Math.floor(r / 60) + ':' + String(r % 60).padStart(2, '0') + '</div></div><div style="flex:1"></div><button data-a="mais15">+15 s</button><button data-a="pula">Pular</button>';
-  if (!r && !descanso.avisou) { descanso.avisou = true; try { navigator.vibrate && navigator.vibrate([200, 100, 200]); } catch (e) {} setTimeout(function () { descanso = null; pintaDescanso(); }, 2500); }
+  el.classList.toggle('fim', !r);
+  el.innerHTML = '<div><div class="xs" style="opacity:.7">' + (r ? 'Descanso' : 'Bora! Próxima série') + '</div><div class="t">' + Math.floor(r / 60) + ':' + String(r % 60).padStart(2, '0') + '</div></div><div style="flex:1"></div>' +
+    '<button data-a="som" aria-label="' + (somLigado() ? 'Desligar som' : 'Ligar som') + '">' + (somLigado() ? '🔔' : '🔕') + '</button><button data-a="mais15">+15 s</button><button data-a="pula">Pular</button>';
+  if (r > 0 && r <= 3 && descanso.bipou !== r) { descanso.bipou = r; bipeContagem(); }
+  if (!r && !descanso.avisou) { descanso.avisou = true; bipeFim(); try { navigator.vibrate && navigator.vibrate([300, 120, 300, 120, 500]); } catch (e) {} setTimeout(function () { descanso = null; pintaDescanso(); }, 4000); }
 }
 function finalizar() {
   var t = st.treino;
@@ -353,6 +413,7 @@ function desenha() {
   else if (v) v.remove();
   a.querySelectorAll('video[data-vid]').forEach(function (v) { if (tempos[v.dataset.vid]) { try { v.currentTime = tempos[v.dataset.vid]; } catch (e) {} } });
   pintaDescanso(); pintaSinc();
+  telaLigada(ui.tela === 'treino' && !!st.treino);
 }
 function escolheFundo() {
   var t = ui.tela;
@@ -393,16 +454,18 @@ document.addEventListener('click', function (ev) {
   else if (a === 'equip') { var q = ui.rasc.equip, i = q.indexOf(v); if (i >= 0) q.splice(i, 1); else q.push(v); desenha(); }
   else if (a === 'fecha-perfil') { ui.tela = null; desenha(); }
   else if (a === 'escolhe') { ui.escolhido = +v; desenha(); window.scrollTo({ top: 0, behavior: 'smooth' }); }
-  else if (a === 'comecar') comecar(+v);
-  else if (a === 'abre-treino') { ui.tela = 'treino'; desenha(); }
+  else if (a === 'comecar') { preparaSom(); comecar(+v); }
+  else if (a === 'abre-treino') { preparaSom(); ui.tela = 'treino'; desenha(); }
   else if (a === 'sai-treino') { ui.tela = null; desenha(); }
   else if (a === 'abre-ex') { st.treino.aberto = st.treino.aberto === +v ? -1 : +v; salva(); desenha(); }
   else if (a === 'tick') {
+    preparaSom(); pedeTela();
     var e = st.treino.ex[+el.dataset.i], s = e.series[+el.dataset.s]; s.feito = !s.feito;
     if (s.feito) { iniciaDescanso(e.item.desc); if (fim(e)) { var prox = st.treino.ex.findIndex(function (x) { return !fim(x); }); st.treino.aberto = prox; } }
     salva(); desenha();
   }
-  else if (a === 'mais15') { if (descanso) { descanso.fim += 15000; descanso.avisou = false; } pintaDescanso(); }
+  else if (a === 'mais15') { if (descanso) { descanso.fim += 15000; descanso.avisou = false; descanso.bipou = null; } pintaDescanso(); }
+  else if (a === 'som') { try { localStorage.setItem('treino.som', somLigado() ? '0' : '1'); } catch (e) {} preparaSom(); if (somLigado()) bipeContagem(); pintaDescanso(); }
   else if (a === 'pula') { descanso = null; pintaDescanso(); }
   else if (a === 'trocar') { ui.trocaI = +el.dataset.i; var usados = st.treino.ex.map(function (x) { return x.id; }); abreSheet(folhaTroca(opcoesTroca(st.treino.ex[ui.trocaI].item, st.perfil, usados), 'troca-treino')); }
   else if (a === 'troca-treino') { var old = st.treino.ex[ui.trocaI]; var it = itemTroca(old.item, v, st.perfil); st.treino.ex[ui.trocaI] = novoEx(it); ui.sheet = null; salva(); desenha(); toast(EX[old.id].n + ' → ' + EX[v].n + ' (só hoje)'); }
