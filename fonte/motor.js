@@ -7,7 +7,7 @@ var FAMILIA = {
   puxada_frente: 'pux', graviton: 'pux', barra_fixa: 'pux', mesa_flexora: 'flex', cadeira_flexora: 'flex', flexora_polia: 'flex',
   agach_livre: 'agach', agach_smith: 'agach', hack: 'agach', agach_corpo: 'agach', goblet: 'agach',
   elev_lateral: 'elat', elev_lateral_polia: 'elat', elev_lateral_elastico: 'elat',
-  crucifixo_inverso: 'post', voador_inverso: 'post', rot_externa_elastico: 'rotext', rot_externa_deitada: 'rotext'
+  crucifixo_inverso: 'post', voador_inverso: 'post', rot_externa_elastico: 'rotext'
 };
 function familia(id) { return FAMILIA[id] || id; }
 

@@ -198,8 +198,8 @@ a.btn{text-decoration:none;display:flex;align-items:center;justify-content:cente
 <div id="extra"></div>
 <div id="sinc" class="sinc" hidden></div>
 <script>
-  var VERSAO = "20261121-1845";
-  var VIDEOS_PADRAO = ["abd_declinado-F", "abd_supra-F", "abducao_deitada-F", "abducao_maq-F", "abducao_polia-F", "aducao_maq-F", "afundo-F", "agach_corpo-F", "agach_livre-F", "agach_smith-F", "barra_fixa-F", "bicicleta-F", "bulgaro-F", "cadeira_ext-F", "cadeira_flexora-F", "caminhada_lateral-F", "coice_caneleira-F", "coice_polia-F", "crossover-F", "crucifixo-F", "crucifixo_inverso-F", "desenv_halter-F", "desenv_maq-F", "elev_frontal-F", "elev_lateral-F", "elev_lateral_elastico-F", "elev_lateral_polia-F", "elev_pelvica-F", "elev_pelvica_h-F", "elev_pelvica_maq-F", "elev_pernas-F", "elev_pernas_barra-F", "face_pull-F", "flexao-F", "flexora_polia-F", "goblet-F", "leg45-F", "mergulho_banco-F", "pant_degrau-F", "pant_legpress-F", "pant_sentado-F", "ponte-F", "prancha-F", "prancha_lateral-F", "pulldown_reto-F", "puxada_frente-F", "puxada_triangulo-F", "remada_baixa-F", "remada_curvada-F", "remada_elastico-F", "remada_unilateral-F", "roda_abd-F", "rosca_alternada-F", "rosca_direta-F", "rosca_elastico-F", "rosca_martelo-F", "rosca_polia-F", "rosca_scott-F", "step_up-F", "stiff-F", "stiff_barra-F", "stiff_unilateral-F", "sumo-F", "supino_barra-F", "supino_halter-F", "supino_incl-F", "swing-F", "triceps_coice-F", "triceps_frances-F", "triceps_polia-F", "triceps_testa-F", "voador-F", "voador_inverso-F"];
+  var VERSAO = "20261121-1852";
+  var VIDEOS_PADRAO = ["abd_declinado-F", "abd_supra-F", "abducao_deitada-F", "abducao_maq-F", "abducao_polia-F", "aducao_maq-F", "afundo-F", "agach_corpo-F", "agach_livre-F", "agach_smith-F", "barra_fixa-F", "bicicleta-F", "bulgaro-F", "cadeira_ext-F", "cadeira_flexora-F", "caminhada_lateral-F", "coice_caneleira-F", "coice_polia-F", "crossover-F", "crucifixo-F", "crucifixo_inverso-F", "desenv_halter-F", "desenv_maq-F", "elev_escapular-F", "elev_frontal-F", "elev_lateral-F", "elev_lateral_elastico-F", "elev_lateral_polia-F", "elev_pelvica-F", "elev_pelvica_h-F", "elev_pelvica_maq-F", "elev_perna_estendida-F", "elev_pernas-F", "elev_pernas_barra-F", "face_pull-F", "flexao-F", "flexora_polia-F", "goblet-F", "isometria_parede-F", "leg45-F", "mergulho_banco-F", "pant_degrau-F", "pant_legpress-F", "pant_sentado-F", "ponte-F", "prancha-F", "prancha_lateral-F", "pulldown_reto-F", "puxada_frente-F", "puxada_triangulo-F", "remada_baixa-F", "remada_curvada-F", "remada_elastico-F", "remada_unilateral-F", "roda_abd-F", "rosca_alternada-F", "rosca_direta-F", "rosca_elastico-F", "rosca_martelo-F", "rosca_polia-F", "rosca_scott-F", "rot_externa_elastico-F", "step_up-F", "stiff-F", "stiff_barra-F", "stiff_unilateral-F", "sumo-F", "supino_barra-F", "supino_halter-F", "supino_incl-F", "swing-F", "triceps_coice-F", "triceps_frances-F", "triceps_polia-F", "triceps_testa-F", "voador-F", "voador_inverso-F"];
 // ===== Biblioteca de exercícios, aparelhos e divisões de treino =====
 // Cada exercício: id, nome, grupo, tipo (c = composto / i = isolado), nível mínimo (1-3),
 // aparelhos exigidos, músculos, nome em inglês (prompt do Google Flow), passos, erro comum.
@@ -247,7 +247,7 @@ var CUIDADOS = {
     nome: 'Dor no ombro', curto: 'Ombro',
     sub: 'Fortalece o manguito rotador (tendinite, supraespinhal) e tira os exercícios com braço acima da cabeça ou pendurado',
     evitar: ['desenv_halter', 'desenv_maq', 'mergulho_banco', 'triceps_frances', 'supino_barra', 'barra_fixa', 'elev_pernas_barra', 'elev_frontal'],
-    reforco: ['rot_externa_elastico', 'rot_externa_deitada', 'elev_escapular', 'face_pull', 'remada_elastico'],
+    reforco: ['rot_externa_elastico', 'elev_escapular', 'face_pull', 'remada_elastico'],
     dica: 'carga bem leve e o braço nunca acima da linha do ombro'
   },
   joelho: {
@@ -529,9 +529,6 @@ var EXERCICIOS = [
   X('rot_externa_elastico', 'Rotação externa com elástico', 'ombro_post', 'i', 1, ['elastico'], 'Manguito rotador (parte de trás do ombro)', 'shoulder external rotation with resistance band',
     ['Prenda o elástico na altura do cotovelo, de lado para o ponto de apoio.', 'Cotovelo colado na cintura, dobrado a 90°, antebraço à frente da barriga.', 'Gire o antebraço para fora, sem descolar o cotovelo.', 'Volte devagar. Carga leve: não pode doer.'],
     'Descolar o cotovelo do corpo ou usar um elástico forte demais.'),
-  X('rot_externa_deitada', 'Rotação externa deitada com halter', 'ombro_post', 'i', 1, ['halteres'], 'Manguito rotador (parte de trás do ombro)', 'side-lying dumbbell shoulder external rotation',
-    ['Deite de lado, com uma toalha dobrada entre o cotovelo de cima e a cintura.', 'Halter bem leve na mão de cima, cotovelo dobrado a 90°.', 'Gire o antebraço para cima, sem tirar o cotovelo do lugar.', 'Desça devagar.'],
-    'Peso alto demais e o cotovelo saindo da cintura.'),
   X('elev_escapular', 'Elevação em Y com polegar para cima', 'ombro', 'i', 1, ['halteres'], 'Supraespinhal e meio do ombro', 'scaption raise with thumbs up',
     ['Em pé, halteres bem leves, polegares apontando para cima.', 'Braços um pouco à frente do corpo, formando um V.', 'Suba os braços esticados até a altura dos ombros, sem passar dela.', 'Desça devagar.'],
     'Subir acima da linha dos ombros ou encolher os ombros.'),
@@ -583,7 +580,7 @@ var FAMILIA = {
   puxada_frente: 'pux', graviton: 'pux', barra_fixa: 'pux', mesa_flexora: 'flex', cadeira_flexora: 'flex', flexora_polia: 'flex',
   agach_livre: 'agach', agach_smith: 'agach', hack: 'agach', agach_corpo: 'agach', goblet: 'agach',
   elev_lateral: 'elat', elev_lateral_polia: 'elat', elev_lateral_elastico: 'elat',
-  crucifixo_inverso: 'post', voador_inverso: 'post', rot_externa_elastico: 'rotext', rot_externa_deitada: 'rotext'
+  crucifixo_inverso: 'post', voador_inverso: 'post', rot_externa_elastico: 'rotext'
 };
 function familia(id) { return FAMILIA[id] || id; }
 

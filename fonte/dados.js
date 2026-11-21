@@ -45,7 +45,7 @@ var CUIDADOS = {
     nome: 'Dor no ombro', curto: 'Ombro',
     sub: 'Fortalece o manguito rotador (tendinite, supraespinhal) e tira os exercícios com braço acima da cabeça ou pendurado',
     evitar: ['desenv_halter', 'desenv_maq', 'mergulho_banco', 'triceps_frances', 'supino_barra', 'barra_fixa', 'elev_pernas_barra', 'elev_frontal'],
-    reforco: ['rot_externa_elastico', 'rot_externa_deitada', 'elev_escapular', 'face_pull', 'remada_elastico'],
+    reforco: ['rot_externa_elastico', 'elev_escapular', 'face_pull', 'remada_elastico'],
     dica: 'carga bem leve e o braço nunca acima da linha do ombro'
   },
   joelho: {
@@ -327,9 +327,6 @@ var EXERCICIOS = [
   X('rot_externa_elastico', 'Rotação externa com elástico', 'ombro_post', 'i', 1, ['elastico'], 'Manguito rotador (parte de trás do ombro)', 'shoulder external rotation with resistance band',
     ['Prenda o elástico na altura do cotovelo, de lado para o ponto de apoio.', 'Cotovelo colado na cintura, dobrado a 90°, antebraço à frente da barriga.', 'Gire o antebraço para fora, sem descolar o cotovelo.', 'Volte devagar. Carga leve: não pode doer.'],
     'Descolar o cotovelo do corpo ou usar um elástico forte demais.'),
-  X('rot_externa_deitada', 'Rotação externa deitada com halter', 'ombro_post', 'i', 1, ['halteres'], 'Manguito rotador (parte de trás do ombro)', 'side-lying dumbbell shoulder external rotation',
-    ['Deite de lado, com uma toalha dobrada entre o cotovelo de cima e a cintura.', 'Halter bem leve na mão de cima, cotovelo dobrado a 90°.', 'Gire o antebraço para cima, sem tirar o cotovelo do lugar.', 'Desça devagar.'],
-    'Peso alto demais e o cotovelo saindo da cintura.'),
   X('elev_escapular', 'Elevação em Y com polegar para cima', 'ombro', 'i', 1, ['halteres'], 'Supraespinhal e meio do ombro', 'scaption raise with thumbs up',
     ['Em pé, halteres bem leves, polegares apontando para cima.', 'Braços um pouco à frente do corpo, formando um V.', 'Suba os braços esticados até a altura dos ombros, sem passar dela.', 'Desça devagar.'],
     'Subir acima da linha dos ombros ou encolher os ombros.'),
